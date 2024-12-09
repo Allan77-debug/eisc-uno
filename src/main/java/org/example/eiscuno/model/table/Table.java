@@ -32,10 +32,11 @@ public class Table {
      * @return The card currently on the table.
      * @throws IndexOutOfBoundsException if there are no cards on the table.
      */
-    public Card getCurrentCardOnTheTable() throws IndexOutOfBoundsException {
+    public Card getCurrentCardOnTheTable() {
         if (cardsTable.isEmpty()) {
-            throw new IndexOutOfBoundsException("There are no cards on the table.");
+            throw new IllegalStateException("No hay cartas en la mesa.");
         }
-        return this.cardsTable.get(this.cardsTable.size()-1);
+        return this.cardsTable.get(this.cardsTable.size() - 1);
     }
+
 }

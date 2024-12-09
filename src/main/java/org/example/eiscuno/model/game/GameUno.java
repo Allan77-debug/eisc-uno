@@ -37,14 +37,17 @@ public class GameUno implements IGameUno {
      */
     @Override
     public void startGame() {
-        for (int i = 0; i < 10; i++) {
-            if (i < 5) {
-                humanPlayer.addCard(this.deck.takeCard());
-            } else {
-                machinePlayer.addCard(this.deck.takeCard());
-            }
+        for (int i = 0; i < 5; i++) {
+            humanPlayer.addCard(this.deck.takeCard());
+            machinePlayer.addCard(this.deck.takeCard());
         }
+
+        // Colocar una carta inicial en la mesa
+        Card initialCard = this.deck.takeCard();
+        this.table.addCardOnTheTable(initialCard);
     }
+
+
 
     /**
      * Allows a player to draw a specified number of cards from the deck.

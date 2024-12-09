@@ -18,28 +18,29 @@ public class Deck {
     public Deck() {
         deckOfCards = new Stack<>();
         initializeDeck();
+        System.out.println("Deck initialized with " + deckOfCards.size() + " cards.");
     }
+
 
     /**
      * Initializes the deck with cards based on the EISCUnoEnum values.
      */
     private void initializeDeck() {
         for (EISCUnoEnum cardEnum : EISCUnoEnum.values()) {
-            if (cardEnum.name().startsWith("GREEN_") ||
-                    cardEnum.name().startsWith("YELLOW_") ||
-                    cardEnum.name().startsWith("BLUE_") ||
-                    cardEnum.name().startsWith("RED_") ||
-                    cardEnum.name().startsWith("SKIP_") ||
-                    cardEnum.name().startsWith("RESERVE_") ||
-                    cardEnum.name().startsWith("TWO_WILD_DRAW_") ||
-                    cardEnum.name().equals("FOUR_WILD_DRAW") ||
-                    cardEnum.name().equals("WILD")) {
-                Card card = new Card(cardEnum.getFilePath(), getCardValue(cardEnum.name()), getCardColor(cardEnum.name()));
-                deckOfCards.push(card);
+            String value = getCardValue(cardEnum.name());
+            String color = getCardColor(cardEnum.name());
+
+            if (value == null) {
+                System.out.println("Skipping invalid card: " + cardEnum.name());
+                continue; // Saltar cartas no válidas
             }
+
+            Card card = new Card(cardEnum.getFilePath(), value, color);
+            deckOfCards.push(card);
         }
         Collections.shuffle(deckOfCards);
     }
+
 
     private String getCardValue(String name) {
         if (name.endsWith("0")){
@@ -92,8 +93,12 @@ public class Deck {
         if (deckOfCards.isEmpty()) {
             throw new IllegalStateException("No hay más cartas en el mazo.");
         }
-        return deckOfCards.pop();
+        Card card = deckOfCards.pop();
+        System.out.println("Card taken: " + card.getValue() + " of " +
+                (card.getColor() != null ? card.getColor() : "ANY") + ". Remaining cards: " + deckOfCards.size());
+        return card;
     }
+
 
     /**
      * Checks if the deck is empty.
