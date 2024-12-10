@@ -12,18 +12,18 @@
 <?import javafx.scene.text.Font?>
 
 <?import javafx.scene.control.ComboBox?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.eiscuno.controller.GameUnoController">
+<BorderPane stylesheets="@styles.css" fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.eiscuno.controller.GameUnoController">
    <left>
       <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Button layoutX="50.0" layoutY="30.0" mnemonicParsing="false" onAction="#onHandleTakeCard" prefHeight="149.0" prefWidth="100.0" text="Baraja" />
+            <Button fx:id="deckButton" layoutX="50.0" layoutY="30.0" mnemonicParsing="false" onAction="#onHandleTakeCard" prefHeight="149.0" prefWidth="100.0" text="Baraja" styleClass="button-image" />
          </children>
       </Pane>
    </left>
    <right>
       <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Button layoutX="50.0" layoutY="75.0" mnemonicParsing="false" onAction="#onHandleUno" prefHeight="50.0" prefWidth="100.0" text="UNO" />
+            <Button fx:id="unoButton" layoutX="50.0" layoutY="75.0" mnemonicParsing="false" onAction="#onHandleUno" prefHeight="50.0" prefWidth="100.0" text="UNO" styleClass="button-image" />
          </children>
       </Pane>
    </right>

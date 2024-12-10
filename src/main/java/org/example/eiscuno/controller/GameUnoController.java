@@ -5,9 +5,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.model.game.GameUno;
@@ -16,6 +17,7 @@ import org.example.eiscuno.model.machine.ThreadSingUNOMachine;
 import org.example.eiscuno.model.machine.TurnEndCallback;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
+import org.example.eiscuno.model.unoenum.EISCUnoEnum;
 
 public class GameUnoController implements TurnEndCallback {
 
@@ -29,10 +31,13 @@ public class GameUnoController implements TurnEndCallback {
     private ImageView tableImageView;
 
     @FXML
-    private ComboBox<String> colorComboBox;
+    private Button deckButton;
 
     @FXML
-    private Button confirmColorButton;
+    private Button unoButton;
+
+    @FXML
+    private BorderPane mainPane;
 
 
     private Player humanPlayer;
@@ -50,6 +55,8 @@ public class GameUnoController implements TurnEndCallback {
     public void initialize() {
         initVariables();
         this.gameUno.startGame();
+        setButtonGraphics();
+        setBackground(EISCUnoEnum.BACKGROUND_UNO.getFilePath());
         this.isPlayerTurn = true;
 
         // Mostrar la carta inicial en la mesa
@@ -60,8 +67,38 @@ public class GameUnoController implements TurnEndCallback {
             System.out.println("Error inicializando la mesa: " + e.getMessage());
         }
 
+        renderMachineCards();
         renderHumanPlayerCards();
         initThreads();
+    }
+
+    // Configurar las imágenes de los botones
+    private void setButtonGraphics() {
+        Image deckImage = new Image(getClass().getResource(EISCUnoEnum.DECK_OF_CARDS.getFilePath()).toString());
+        ImageView deckImageView = new ImageView(deckImage);
+        deckImageView.setFitWidth(100);
+        deckImageView.setFitHeight(120);
+        deckButton.setGraphic(deckImageView);
+
+        Image unoImage = new Image(getClass().getResource(EISCUnoEnum.BUTTON_UNO.getFilePath()).toString());
+        ImageView unoImageView = new ImageView(unoImage);
+        unoImageView.setFitWidth(100);
+        unoImageView.setFitHeight(50);
+        unoButton.setGraphic(unoImageView);
+    }
+
+    private void setBackground(String backgroundPath) {
+        Image backgroundImage = new Image(getClass().getResource(backgroundPath).toString());
+
+        BackgroundImage background = new BackgroundImage(
+                backgroundImage,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(100, 100, true, true, false, true)
+        );
+
+        mainPane.setBackground(new Background(background));
     }
 
     @Override
@@ -104,6 +141,28 @@ public class GameUnoController implements TurnEndCallback {
             this.gridPaneCardsPlayer.add(cardImageView, i, 0);
         }
     }
+
+    /**
+     * Renders the machine's cards as "hidden" in the grid pane.
+     */
+    private void renderMachineCards() {
+        this.gridPaneCardsMachine.getChildren().clear(); // Limpia las cartas actuales
+
+        // Obtener las cartas visibles de la máquina (solo cantidad, no contenido)
+        Card[] hiddenCards = this.gameUno.getCurrentVisibleCardsMachine(this.posInitCardToShow);
+
+        for (int i = 0; i < hiddenCards.length; i++) {
+            // Crear un ImageView para mostrar el dorso de la carta
+            ImageView hiddenCardImageView = new ImageView(new Image(getClass().getResource(EISCUnoEnum.CARD_UNO.getFilePath()).toString()));
+            hiddenCardImageView.setFitWidth(70); // Ajusta el tamaño según tu diseño
+            hiddenCardImageView.setFitHeight(100);
+            hiddenCardImageView.setPreserveRatio(true);
+
+            // Agregar la carta tapada al gridPane
+            this.gridPaneCardsMachine.add(hiddenCardImageView, i, 0);
+        }
+    }
+
 
     /**
      * Attaches a click handler to a card's ImageView for playing the card.

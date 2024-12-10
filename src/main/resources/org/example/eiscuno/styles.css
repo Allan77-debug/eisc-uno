@@ -1,0 +1,6 @@
+/* styles.css */
+.button-image {
+    -fx-background-color: transparent; /* Fondo transparente */
+    -fx-border-color: transparent;    /* Sin borde */
+    -fx-padding: 0;                   /* Sin relleno */
+}

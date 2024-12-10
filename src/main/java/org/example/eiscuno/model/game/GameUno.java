@@ -86,24 +86,36 @@ public class GameUno implements IGameUno {
         }
     }
 
+
+
+
     /**
-     * Retrieves the current visible cards of the human player starting from a specific position.
+     * Retrieves the current visible cards for any player starting from a specific position.
      *
+     * @param player The player whose cards are to be retrieved.
      * @param posInitCardToShow The initial position of the cards to show.
-     * @return An array of cards visible to the human player.
+     * @return An array of cards visible to the player.
      */
-    @Override
-    public Card[] getCurrentVisibleCardsHumanPlayer(int posInitCardToShow) {
-        int totalCards = this.humanPlayer.getCardsPlayer().size();
+    private Card[] getCurrentVisibleCards(Player player, int posInitCardToShow) {
+        int totalCards = player.getCardsPlayer().size();
         int numVisibleCards = Math.min(4, totalCards - posInitCardToShow);
         Card[] cards = new Card[numVisibleCards];
 
         for (int i = 0; i < numVisibleCards; i++) {
-            cards[i] = this.humanPlayer.getCard(posInitCardToShow + i);
+            cards[i] = player.getCard(posInitCardToShow + i);
         }
 
         return cards;
     }
+
+    public Card[] getCurrentVisibleCardsHumanPlayer(int posInitCardToShow) {
+        return getCurrentVisibleCards(this.humanPlayer, posInitCardToShow);
+    }
+
+    public Card[] getCurrentVisibleCardsMachine(int posInitCardToShow) {
+        return getCurrentVisibleCards(this.machinePlayer, posInitCardToShow);
+    }
+
 
     /**
      * Checks if the game is over.
