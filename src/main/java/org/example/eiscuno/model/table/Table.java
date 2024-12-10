@@ -13,8 +13,8 @@ public class Table {
     /**
      * Constructs a new Table object with no cards on it.
      */
-    public Table(){
-        this.cardsTable = new ArrayList<Card>();
+    public Table() {
+        this.cardsTable = new ArrayList<>();
     }
 
     /**
@@ -22,15 +22,18 @@ public class Table {
      *
      * @param card The card to be added to the table.
      */
-    public void addCardOnTheTable(Card card){
+    public void addCardOnTheTable(Card card) {
+        // Agregar la carta a la mesa
         this.cardsTable.add(card);
+        System.out.println("Card added to the table: " + card.getValue() +
+                (card.getColor() != null ? " of " + card.getColor() : " of ANY"));
     }
 
     /**
      * Retrieves the current card on the table.
      *
      * @return The card currently on the table.
-     * @throws IndexOutOfBoundsException if there are no cards on the table.
+     * @throws IllegalStateException if there are no cards on the table.
      */
     public Card getCurrentCardOnTheTable() {
         if (cardsTable.isEmpty()) {
@@ -38,5 +41,4 @@ public class Table {
         }
         return this.cardsTable.get(this.cardsTable.size() - 1);
     }
-
 }

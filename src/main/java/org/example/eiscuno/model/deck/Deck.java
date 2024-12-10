@@ -30,46 +30,64 @@ public class Deck {
             String value = getCardValue(cardEnum.name());
             String color = getCardColor(cardEnum.name());
 
+            // Saltar cartas Reverse
+            if ("Reverse".equals(value)) {
+                System.out.println("Skipping Reverse card: " + cardEnum.name());
+                continue;
+            }
+
             if (value == null) {
                 System.out.println("Skipping invalid card: " + cardEnum.name());
                 continue; // Saltar cartas no válidas
             }
 
             Card card = new Card(cardEnum.getFilePath(), value, color);
+            System.out.println("Adding card: " + value + " of " + (color != null ? color : "ANY"));
             deckOfCards.push(card);
         }
         Collections.shuffle(deckOfCards);
     }
 
 
-    private String getCardValue(String name) {
-        if (name.endsWith("0")){
-            return "0";
-        } else if (name.endsWith("1")){
-            return "1";
-        } else if (name.endsWith("2")){
-            return "2";
-        } else if (name.endsWith("3")){
-            return "3";
-        } else if (name.endsWith("4")){
-            return "4";
-        } else if (name.endsWith("5")){
-            return "5";
-        } else if (name.endsWith("6")){
-            return "6";
-        } else if (name.endsWith("7")){
-            return "7";
-        } else if (name.endsWith("8")){
-            return "8";
-        } else if (name.endsWith("9")){
-            return "9";
-        } else {
-            return null;
-        }
 
+    private String getCardValue(String name) {
+        if (name.endsWith("0")) {
+            return "0";
+        } else if (name.endsWith("1")) {
+            return "1";
+        } else if (name.endsWith("2") && !name.contains("WILD_DRAW")) { // Diferenciar "+2" de números
+            return "2";
+        } else if (name.endsWith("3")) {
+            return "3";
+        } else if (name.endsWith("4") && !name.equals("FOUR_WILD_DRAW")) { // Diferenciar "+4"
+            return "4";
+        } else if (name.endsWith("5")) {
+            return "5";
+        } else if (name.endsWith("6")) {
+            return "6";
+        } else if (name.endsWith("7")) {
+            return "7";
+        } else if (name.endsWith("8")) {
+            return "8";
+        } else if (name.endsWith("9")) {
+            return "9";
+        } else if (name.startsWith("SKIP")) {
+            return "Skip";
+        } else if (name.startsWith("RESERVE")) {
+            return "Reverse";
+        } else if (name.startsWith("TWO_WILD_DRAW")) {
+            return "+2";
+        } else if (name.equals("FOUR_WILD_DRAW")) {
+            return "+4";
+        } else if (name.equals("WILD")) {
+            return "Wild";
+        } else {
+            return null; // Para cartas no válidas
+        }
     }
 
-    private String getCardColor(String name){
+
+    private String getCardColor(String name) {
         if(name.startsWith("GREEN")){
             return "GREEN";
         } else if(name.startsWith("YELLOW")){
@@ -78,10 +96,19 @@ public class Deck {
             return "BLUE";
         } else if(name.startsWith("RED")){
             return "RED";
+        } else if (name.endsWith("GREEN")) {
+            return "GREEN";
+        } else if (name.endsWith("YELLOW")) {
+            return "YELLOW";
+        } else if (name.endsWith("RED")) {
+            return "RED";
+        } else if (name.endsWith("BLUE")) {
+            return "BLUE";
         } else {
             return null;
         }
     }
+
 
     /**
      * Takes a card from the top of the deck.

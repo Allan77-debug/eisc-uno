@@ -3,6 +3,8 @@ package org.example.eiscuno.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -25,6 +27,13 @@ public class GameUnoController implements TurnEndCallback {
 
     @FXML
     private ImageView tableImageView;
+
+    @FXML
+    private ComboBox<String> colorComboBox;
+
+    @FXML
+    private Button confirmColorButton;
+
 
     private Player humanPlayer;
     private Player machinePlayer;
@@ -76,8 +85,7 @@ public class GameUnoController implements TurnEndCallback {
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
 
-        // Pasa el controlador actual como callback
-        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.deck, this.tableImageView, this);
+        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.humanPlayer, this.deck, this.tableImageView, this);
         threadPlayMachine.start();
     }
 
@@ -118,6 +126,32 @@ public class GameUnoController implements TurnEndCallback {
         });
     }
 
+    /**
+     * Plays a card and updates the game state.
+     *
+     * @param card the card to play
+     */
+    private void playCard(Card card) {
+        // Si la carta es especial y no tiene color, asigna el color actual o permite al jugador elegir
+        if (card.isSpecial() && (card.getValue().equals("Wild") || card.getValue().equals("+4"))) {
+            String chosenColor = chooseColor(); // Interfaz para elegir color
+            card.setColor(chosenColor);
+            System.out.println("Chosen color: " + chosenColor);
+        }
+
+        table.addCardOnTheTable(card); // Agregar la carta a la mesa
+        tableImageView.setImage(card.getImage()); // Actualizar la imagen en la mesa
+        humanPlayer.removeCard(findCardIndexInHand(card)); // Eliminar la carta de la mano del jugador
+
+        // Manejar efectos especiales
+        if (card.isSpecial()) {
+            handleSpecialCard(card);
+        }
+
+        renderHumanPlayerCards(); // Actualizar las cartas visibles del jugador
+        endPlayerTurn(); // Finalizar el turno del jugador
+    }
+
 
     /**
      * Checks if a card can be played based on the current table card.
@@ -127,21 +161,66 @@ public class GameUnoController implements TurnEndCallback {
      */
     private boolean canPlayCard(Card card) {
         Card topCard = this.table.getCurrentCardOnTheTable();
-        return card.getColor().equals(topCard.getColor()) || card.getValue().equals(topCard.getValue());
+
+        // Permitir jugar cartas del mismo color
+        if (topCard.getColor() != null && card.getColor() != null && card.getColor().equals(topCard.getColor())) {
+            return true;
+        }
+
+        // Permitir jugar cartas con el mismo valor (incluidas cartas especiales)
+        if (card.getValue().equals(topCard.getValue())) {
+            return true;
+        }
+
+        // Permitir jugar "Wild" y "+4" en cualquier momento
+        if (card.isSpecial() && (card.getValue().equals("Wild") || card.getValue().equals("+4"))) {
+            return true;
+        }
+
+        // La carta no es jugable
+        return false;
     }
 
-    /**
-     * Plays a card and updates the game state.
-     *
-     * @param card the card to play
-     */
-    private void playCard(Card card) {
-        table.addCardOnTheTable(card); // Agregar la carta a la mesa
-        tableImageView.setImage(card.getImage()); // Actualizar la imagen en la mesa
-        humanPlayer.removeCard(findCardIndexInHand(card)); // Eliminar la carta de la mano del jugador
-        renderHumanPlayerCards(); // Actualizar las cartas visibles del jugador
 
-        endPlayerTurn(); // Finalizar el turno del jugador
+    private void handleSpecialCard(Card card) {
+        switch (card.getValue()) {
+            case "Skip": // Ceder turno
+                System.out.println("Opponent's turn is skipped!");
+                break;
+            case "Reverse": // Reversa
+                System.out.println("Direction reversed!");
+                break;
+            case "+2": // Tomar 2 cartas
+                System.out.println("Opponent takes 2 cards!");
+                for (int i = 0; i < 2; i++) {
+                    if (!deck.isEmpty()) {
+                        machinePlayer.addCard(deck.takeCard());
+                    }
+                }
+                break;
+            case "+4": // Tomar 4 cartas
+                System.out.println("Opponent takes 4 cards!");
+                for (int i = 0; i < 4; i++) {
+                    if (!deck.isEmpty()) {
+                        machinePlayer.addCard(deck.takeCard());
+                    }
+                }
+                // Permitir cambio de color
+                System.out.println("Choose a color!");
+                card.setColor(chooseColor());
+                break;
+            case "Wild": // Cambio de color
+                System.out.println("Choose a color!");
+                card.setColor(chooseColor());
+                break;
+
+        }
+    }
+
+    private String chooseColor() {
+        // Implementa lógica para que el jugador elija un color
+        String[] colors = {"RED", "YELLOW", "BLUE", "GREEN"};
+        return colors[(int) (Math.random() * colors.length)];
     }
 
 
@@ -195,7 +274,6 @@ public class GameUnoController implements TurnEndCallback {
         threadPlayMachine.setHasPlayerPlayed(true); // Permite que la máquina juegue
         System.out.println("Player's turn has ended. Machine is now playing.");
     }
-
 
     @FXML
     void onHandleUno(ActionEvent event) {

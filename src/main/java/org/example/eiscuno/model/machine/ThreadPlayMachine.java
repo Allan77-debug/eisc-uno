@@ -13,12 +13,14 @@ public class ThreadPlayMachine extends Thread {
     private ImageView tableImageView;
     private volatile boolean hasPlayerPlayed;
     private TurnEndCallback callback;
+    private Player humanPlayer; // Nueva referencia
 
-    public ThreadPlayMachine(Table table, Player machinePlayer, Deck deck, ImageView tableImageView, TurnEndCallback callback) {
+    public ThreadPlayMachine(Table table, Player machinePlayer, Player humanPlayer, Deck deck, ImageView tableImageView, TurnEndCallback callback) {
         this.table = table;
         this.machinePlayer = machinePlayer;
         this.deck = deck;
         this.tableImageView = tableImageView;
+        this.humanPlayer = humanPlayer;
         this.hasPlayerPlayed = false;
         this.callback = callback;
     }
@@ -41,56 +43,104 @@ public class ThreadPlayMachine extends Thread {
     private void playTurn() {
         Card cardToPlay = findPlayableCard(); // Buscar una carta jugable
 
-        if (cardToPlay != null) { // La máquina tiene una carta jugable
-            System.out.println("Machine plays a card: " + cardToPlay.getValue() + " of " + cardToPlay.getColor());
+        if (cardToPlay != null) {
+            System.out.println("Machine plays a card: " + cardToPlay.getValue() +
+                    (cardToPlay.getColor() != null ? " of " + cardToPlay.getColor() : ""));
             table.addCardOnTheTable(cardToPlay); // Jugar la carta
             tableImageView.setImage(cardToPlay.getImage());
             machinePlayer.removeCard(machinePlayer.getCardsPlayer().indexOf(cardToPlay));
+
+            // Manejar efectos de cartas especiales
+            if (cardToPlay.isSpecial()) {
+                handleSpecialCardEffect(cardToPlay);
+            }
         } else { // No tiene cartas jugables
             if (!deck.isEmpty()) { // Solo toma una carta si el mazo no está vacío
                 Card newCard = deck.takeCard();
                 machinePlayer.addCard(newCard);
                 System.out.println("Machine takes a card: " + newCard.getValue() + " of " +
                         (newCard.getColor() != null ? newCard.getColor() : "ANY"));
-                System.out.println("Machine ends turn after taking a card.");
             } else {
                 System.out.println("Deck is empty. Machine skips turn.");
             }
         }
 
-        // Notificar al controlador que el turno de la máquina ha terminado
         if (callback != null) {
             callback.onMachineTurnEnd();
         }
     }
 
 
-
-
-    private void putCardOnTheTable() {
-        Card cardToPlay = findPlayableCard();
-        if (cardToPlay != null) {
-            table.addCardOnTheTable(cardToPlay);
-            tableImageView.setImage(cardToPlay.getImage());
-            machinePlayer.removeCard(machinePlayer.getCardsPlayer().indexOf(cardToPlay));
-        } else {
-            if (!deck.isEmpty()) {
-                System.out.println("Machine takes a card.");
-                machinePlayer.addCard(deck.takeCard());
-            } else {
-                System.out.println("Deck is empty. Machine skips turn.");
-            }
+    private void handleSpecialCardEffect(Card card) {
+        switch (card.getValue()) {
+            case "Skip":
+                System.out.println("Player's turn is skipped!");
+                break;
+            case "Reverse":
+                System.out.println("Direction reversed!");
+                break;
+            case "+2":
+                System.out.println("Player takes 2 cards!");
+                for (int i = 0; i < 2; i++) {
+                    if (!deck.isEmpty()) {
+                        humanPlayer.addCard(deck.takeCard());
+                    }
+                }
+                break;
+            case "+4":
+                System.out.println("Player takes 4 cards!");
+                for (int i = 0; i < 4; i++) {
+                    if (!deck.isEmpty()) {
+                        humanPlayer.addCard(deck.takeCard());
+                    }
+                }
+                System.out.println("Machine chooses a color!");
+                String newColor = chooseRandomColor();
+                table.getCurrentCardOnTheTable().setColor(newColor); // Cambiar color en la mesa
+                System.out.println("New color: " + newColor);
+                break;
+            case "Wild":
+                System.out.println("Machine chooses a color!");
+                String chosenColor = chooseRandomColor();
+                table.getCurrentCardOnTheTable().setColor(chosenColor); // Cambiar color en la mesa
+                System.out.println("New color: " + chosenColor);
+                break;
         }
     }
+
+
+
+    private String chooseRandomColor() {
+        String[] colors = {"RED", "YELLOW", "BLUE", "GREEN"};
+        int index = (int) (Math.random() * colors.length);
+        System.out.println("Machine chooses color: " + colors[index]);
+        return colors[index];
+    }
+
     private Card findPlayableCard() {
         Card topCard = table.getCurrentCardOnTheTable();
+
         for (Card card : machinePlayer.getCardsPlayer()) {
-            if (card.getColor().equals(topCard.getColor()) || card.getValue().equals(topCard.getValue())) {
+            // Verificar si la carta es especial y tiene color
+            if (card.isSpecial() && card.getColor() != null) {
+                if (card.getColor().equals(topCard.getColor())) {
+                    return card; // Carta especial jugable si coincide en color
+                }
+            }
+
+            // Verificar si la carta tiene el mismo color o valor
+            if (card.getColor() != null && (card.getColor().equals(topCard.getColor()) || card.getValue().equals(topCard.getValue()))) {
+                return card; // Carta normal jugable
+            }
+
+            // Verificar si la carta es "Wild" o "+4", siempre jugables
+            if (card.isSpecial() && (card.getValue().equals("Wild") || card.getValue().equals("+4"))) {
                 return card;
             }
         }
-        return null; // No playable card
+        return null; // No hay cartas jugables
     }
+
 
     public void setHasPlayerPlayed(boolean hasPlayerPlayed) {
         this.hasPlayerPlayed = hasPlayerPlayed;

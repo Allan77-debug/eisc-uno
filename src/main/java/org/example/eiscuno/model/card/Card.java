@@ -12,6 +12,7 @@ public class Card {
     private String color;
     private Image image;
     private ImageView cardImageView;
+    private boolean isSpecial;
 
     /**
      * Constructs a Card with the specified image URL and name.
@@ -23,8 +24,14 @@ public class Card {
         this.url = url;
         this.value = value;
         this.color = color;
+        this.isSpecial = value != null && (value.equals("Skip") || value.equals("Reverse") ||
+                value.equals("+2") || value.equals("+4") || value.equals("Wild"));
         this.image = new Image(String.valueOf(getClass().getResource(url)));
         this.cardImageView = createCardImageView();
+    }
+
+    public boolean isSpecial() {
+        return isSpecial;
     }
 
     /**
@@ -39,6 +46,11 @@ public class Card {
         card.setFitWidth(70);
         return card;
     }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
 
     /**
      * Gets the ImageView representation of the card.
