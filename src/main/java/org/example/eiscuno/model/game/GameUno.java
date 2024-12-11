@@ -37,14 +37,17 @@ public class GameUno implements IGameUno {
      */
     @Override
     public void startGame() {
-        for (int i = 0; i < 10; i++) {
-            if (i < 5) {
-                humanPlayer.addCard(this.deck.takeCard());
-            } else {
-                machinePlayer.addCard(this.deck.takeCard());
-            }
+        for (int i = 0; i < 5; i++) {
+            humanPlayer.addCard(this.deck.takeCard());
+            machinePlayer.addCard(this.deck.takeCard());
         }
+
+        // Colocar una carta inicial en la mesa
+        Card initialCard = this.deck.takeCard();
+        this.table.addCardOnTheTable(initialCard);
     }
+
+
 
     /**
      * Allows a player to draw a specified number of cards from the deck.
@@ -83,24 +86,36 @@ public class GameUno implements IGameUno {
         }
     }
 
+
+
+
     /**
-     * Retrieves the current visible cards of the human player starting from a specific position.
+     * Retrieves the current visible cards for any player starting from a specific position.
      *
+     * @param player The player whose cards are to be retrieved.
      * @param posInitCardToShow The initial position of the cards to show.
-     * @return An array of cards visible to the human player.
+     * @return An array of cards visible to the player.
      */
-    @Override
-    public Card[] getCurrentVisibleCardsHumanPlayer(int posInitCardToShow) {
-        int totalCards = this.humanPlayer.getCardsPlayer().size();
+    private Card[] getCurrentVisibleCards(Player player, int posInitCardToShow) {
+        int totalCards = player.getCardsPlayer().size();
         int numVisibleCards = Math.min(4, totalCards - posInitCardToShow);
         Card[] cards = new Card[numVisibleCards];
 
         for (int i = 0; i < numVisibleCards; i++) {
-            cards[i] = this.humanPlayer.getCard(posInitCardToShow + i);
+            cards[i] = player.getCard(posInitCardToShow + i);
         }
 
         return cards;
     }
+
+    public Card[] getCurrentVisibleCardsHumanPlayer(int posInitCardToShow) {
+        return getCurrentVisibleCards(this.humanPlayer, posInitCardToShow);
+    }
+
+    public Card[] getCurrentVisibleCardsMachine(int posInitCardToShow) {
+        return getCurrentVisibleCards(this.machinePlayer, posInitCardToShow);
+    }
+
 
     /**
      * Checks if the game is over.
