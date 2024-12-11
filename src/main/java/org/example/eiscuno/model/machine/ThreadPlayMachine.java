@@ -6,14 +6,18 @@ import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.deck.Deck;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class ThreadPlayMachine extends Thread {
-    private Table table;
-    private Player machinePlayer;
-    private Deck deck;
-    private ImageView tableImageView;
+    private final Table table;
+    private final Player machinePlayer;
+    private final Deck deck;
+    private final ImageView tableImageView;
     private volatile boolean hasPlayerPlayed;
-    private TurnEndCallback callback;
-    private Player humanPlayer; // Nueva referencia
+    private final TurnEndCallback callback;
+    private final Player humanPlayer; // Nueva referencia
+    private static final Logger LOGGER = Logger.getLogger(ThreadPlayMachine.class.getName());
 
     public ThreadPlayMachine(Table table, Player machinePlayer, Player humanPlayer, Deck deck, ImageView tableImageView, TurnEndCallback callback) {
         this.table = table;
@@ -27,21 +31,34 @@ public class ThreadPlayMachine extends Thread {
 
     @Override
     public void run() {
-        while (true) {
-            if (hasPlayerPlayed) {
-                try {
-                    Thread.sleep((long) (2000 + Math.random() * 2000)); // Espera de 2 a 4 segundos
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        synchronized (this) {
+            while (!Thread.currentThread().isInterrupted()) {
+                if (hasPlayerPlayed) {
+                    playTurn(); // Ejecuta la lógica del turno
+                    hasPlayerPlayed = false; // Resetea la bandera después de completar el turno
                 }
-                playTurn();
-                hasPlayerPlayed = false;
+                try {
+                    wait(); // Espera hasta que se notifique
+                } catch (InterruptedException e) {
+                    LOGGER.log(Level.SEVERE, "Thread was interrupted", e);
+                    Thread.currentThread().interrupt(); // Restablece el estado de interrupción
+                }
             }
         }
     }
 
+
     private void playTurn() {
         do {
+
+            try {
+                Thread.sleep((long) (2000 + Math.random() * 2000)); // Espera de 2 a 4 segundos entre turnos
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.SEVERE, "Thread was interrupted", e);
+                Thread.currentThread().interrupt(); // Restablece el estado de interrupción
+
+            }
+
             this.skipTurn = false; // Reinicia la bandera al inicio del turno
             Card cardToPlay = findPlayableCard(); // Buscar una carta jugable
 
@@ -71,6 +88,7 @@ public class ThreadPlayMachine extends Thread {
             if (callback != null && !skipTurn) { // Llamar callback solo si no se repite el turno
                 callback.onMachineTurnEnd();
             }
+
 
         } while (skipTurn); // Si skipTurn es true repetir el turno
     }
@@ -153,7 +171,8 @@ public class ThreadPlayMachine extends Thread {
     }
 
 
-    public void setHasPlayerPlayed(boolean hasPlayerPlayed) {
+    public synchronized void setHasPlayerPlayed(boolean hasPlayerPlayed) {
         this.hasPlayerPlayed = hasPlayerPlayed;
+        notify(); // Notificar al hilo para que ejecute el turno
     }
 }

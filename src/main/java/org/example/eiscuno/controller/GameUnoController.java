@@ -49,7 +49,6 @@ public class GameUnoController implements TurnEndCallback {
     private int posInitCardToShow;
     private boolean isPlayerTurn;
 
-    private ThreadSingUNOMachine threadSingUNOMachine;
     private ThreadPlayMachine threadPlayMachine;
 
     @FXML
@@ -73,7 +72,7 @@ public class GameUnoController implements TurnEndCallback {
         initThreads();
     }
 
-    // Configurar las imágenes de los botones
+    // Configurar las imagenes de los botones
     private void setButtonGraphics() {
         Image deckImage = new Image(getClass().getResource(EISCUnoEnum.DECK_OF_CARDS.getFilePath()).toString());
         ImageView deckImageView = new ImageView(deckImage);
@@ -122,7 +121,7 @@ public class GameUnoController implements TurnEndCallback {
     }
 
     private void initThreads() {
-        threadSingUNOMachine = new ThreadSingUNOMachine(this.humanPlayer.getCardsPlayer());
+        ThreadSingUNOMachine threadSingUNOMachine = new ThreadSingUNOMachine(this.humanPlayer.getCardsPlayer());
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
 

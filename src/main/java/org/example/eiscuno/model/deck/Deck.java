@@ -10,7 +10,7 @@ import java.util.Stack;
  * Represents a deck of Uno cards.
  */
 public class Deck {
-    private Stack<Card> deckOfCards;
+    private final Stack<Card> deckOfCards;
 
     /**
      * Constructs a new deck of Uno cards and initializes it.
@@ -82,7 +82,7 @@ public class Deck {
         } else if (name.equals("WILD")) {
             return "Wild";
         } else {
-            return null; // Para cartas no válidas
+            return null; // Para cartas no validas
         }
     }
 
