@@ -41,40 +41,47 @@ public class ThreadPlayMachine extends Thread {
     }
 
     private void playTurn() {
-        Card cardToPlay = findPlayableCard(); // Buscar una carta jugable
+        do {
+            this.skipTurn = false; // Reinicia la bandera al inicio del turno
+            Card cardToPlay = findPlayableCard(); // Buscar una carta jugable
 
-        if (cardToPlay != null) {
-            System.out.println("Machine plays a card: " + cardToPlay.getValue() +
-                    (cardToPlay.getColor() != null ? " of " + cardToPlay.getColor() : ""));
-            table.addCardOnTheTable(cardToPlay); // Jugar la carta
-            tableImageView.setImage(cardToPlay.getImage());
-            machinePlayer.removeCard(machinePlayer.getCardsPlayer().indexOf(cardToPlay));
+            if (cardToPlay != null) {
+                System.out.println("Machine plays a card: " + cardToPlay.getValue() +
+                        (cardToPlay.getColor() != null ? " of " + cardToPlay.getColor() : ""));
+                table.addCardOnTheTable(cardToPlay); // Jugar la carta
+                tableImageView.setImage(cardToPlay.getImage());
+                machinePlayer.removeCard(machinePlayer.getCardsPlayer().indexOf(cardToPlay));
 
-            // Manejar efectos de cartas especiales
-            if (cardToPlay.isSpecial()) {
-                handleSpecialCardEffect(cardToPlay);
+                // Manejar efectos de cartas especiales
+                if (cardToPlay.isSpecial()) {
+                    handleSpecialCardEffect(cardToPlay);
+                }
+            } else { // No tiene cartas jugables
+                if (!deck.isEmpty()) { // Solo toma una carta si el mazo no está vacío
+                    Card newCard = deck.takeCard();
+                    machinePlayer.addCard(newCard);
+                    System.out.println("Machine takes a card: " + newCard.getValue() + " of " +
+                            (newCard.getColor() != null ? newCard.getColor() : "ANY"));
+                } else {
+                    System.out.println("Deck is empty. Machine skips turn.");
+                }
             }
-        } else { // No tiene cartas jugables
-            if (!deck.isEmpty()) { // Solo toma una carta si el mazo no está vacío
-                Card newCard = deck.takeCard();
-                machinePlayer.addCard(newCard);
-                System.out.println("Machine takes a card: " + newCard.getValue() + " of " +
-                        (newCard.getColor() != null ? newCard.getColor() : "ANY"));
-            } else {
-                System.out.println("Deck is empty. Machine skips turn.");
-            }
-        }
 
-        if (callback != null) {
-            callback.onMachineTurnEnd();
-        }
+            // Actualiza las cartas de la máquina en la interfaz
+            if (callback != null && !skipTurn) { // Llamar callback solo si no se repite el turno
+                callback.onMachineTurnEnd();
+            }
+
+        } while (skipTurn); // Si skipTurn es true repetir el turno
     }
+
 
 
     private void handleSpecialCardEffect(Card card) {
         switch (card.getValue()) {
             case "Skip":
                 System.out.println("Player's turn is skipped!");
+                this.skipTurn = true;
                 break;
             case "Reverse":
                 System.out.println("Direction reversed!");
@@ -108,7 +115,11 @@ public class ThreadPlayMachine extends Thread {
         }
     }
 
+    private volatile boolean skipTurn; // Nueva bandera para Skip
 
+    public void setSkipTurn(boolean skipTurn) {
+        this.skipTurn = skipTurn;
+    }
 
     private String chooseRandomColor() {
         String[] colors = {"RED", "YELLOW", "BLUE", "GREEN"};

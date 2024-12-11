@@ -38,7 +38,7 @@ public class Deck {
 
             if (value == null) {
                 System.out.println("Skipping invalid card: " + cardEnum.name());
-                continue; // Saltar cartas no válidas
+                continue; // Saltar cartas no validas
             }
 
             Card card = new Card(cardEnum.getFilePath(), value, color);

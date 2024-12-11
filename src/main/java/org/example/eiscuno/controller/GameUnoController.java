@@ -1,6 +1,7 @@
 // Controlador mejorado usando SOLID
 package org.example.eiscuno.controller;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -103,8 +104,11 @@ public class GameUnoController implements TurnEndCallback {
 
     @Override
     public void onMachineTurnEnd() {
-        this.isPlayerTurn = true; // Cambia el turno al jugador humano
-        System.out.println("Machine's turn has ended. It's now your turn!");
+        Platform.runLater(() -> {
+            this.isPlayerTurn = true; // Cambia el turno al jugador humano
+            renderMachineCards(); // Actualiza las cartas de la maquina
+            System.out.println("Machine's turn has ended. It's now your turn!");
+        });
     }
 
 
@@ -148,13 +152,14 @@ public class GameUnoController implements TurnEndCallback {
     private void renderMachineCards() {
         this.gridPaneCardsMachine.getChildren().clear(); // Limpia las cartas actuales
 
-        // Obtener las cartas visibles de la máquina (solo cantidad, no contenido)
-        Card[] hiddenCards = this.gameUno.getCurrentVisibleCardsMachine(this.posInitCardToShow);
+        // Obtener las cartas visibles de la máquina
+        Card[] hiddenCards = this.machinePlayer.getCardsPlayer().toArray(new Card[0]);
+        int numVisibleCards = Math.min(4, hiddenCards.length); // Limitar a un máximo de 4 cartas
 
-        for (int i = 0; i < hiddenCards.length; i++) {
+        for (int i = 0; i < numVisibleCards; i++) {
             // Crear un ImageView para mostrar el dorso de la carta
             ImageView hiddenCardImageView = new ImageView(new Image(getClass().getResource(EISCUnoEnum.CARD_UNO.getFilePath()).toString()));
-            hiddenCardImageView.setFitWidth(70); // Ajusta el tamaño según tu diseño
+            hiddenCardImageView.setFitWidth(70);
             hiddenCardImageView.setFitHeight(100);
             hiddenCardImageView.setPreserveRatio(true);
 
@@ -191,7 +196,6 @@ public class GameUnoController implements TurnEndCallback {
      * @param card the card to play
      */
     private void playCard(Card card) {
-        // Si la carta es especial y no tiene color, asigna el color actual o permite al jugador elegir
         if (card.isSpecial() && (card.getValue().equals("Wild") || card.getValue().equals("+4"))) {
             String chosenColor = chooseColor(); // Interfaz para elegir color
             card.setColor(chosenColor);
@@ -203,13 +207,15 @@ public class GameUnoController implements TurnEndCallback {
         humanPlayer.removeCard(findCardIndexInHand(card)); // Eliminar la carta de la mano del jugador
 
         // Manejar efectos especiales
-        if (card.isSpecial()) {
-            handleSpecialCard(card);
-        }
+        handleSpecialCard(card);
 
-        renderHumanPlayerCards(); // Actualizar las cartas visibles del jugador
-        endPlayerTurn(); // Finalizar el turno del jugador
+        // Si no es un turno repetido finaliza el turno
+        if (!card.getValue().equals("Skip")) {
+            renderHumanPlayerCards(); // Actualizar las cartas visibles del jugador
+            endPlayerTurn(); // Finalizar el turno del jugador
+        }
     }
+
 
 
     /**
@@ -245,6 +251,15 @@ public class GameUnoController implements TurnEndCallback {
         switch (card.getValue()) {
             case "Skip": // Ceder turno
                 System.out.println("Opponent's turn is skipped!");
+                if (isPlayerTurn) {
+                    System.out.println("Player repeats the turn due to Skip card!");
+                    // Evitar finalizar el turno del jugador
+                    renderHumanPlayerCards();
+                    return; // Salir del metodo sin finalizar el turno
+                } else {
+                    System.out.println("Machine repeats the turn due to Skip card!");
+                    threadPlayMachine.setSkipTurn(true); //la máquina debe repetir turno
+                }
                 break;
             case "Reverse": // Reversa
                 System.out.println("Direction reversed!");
@@ -264,7 +279,6 @@ public class GameUnoController implements TurnEndCallback {
                         machinePlayer.addCard(deck.takeCard());
                     }
                 }
-                // Permitir cambio de color
                 System.out.println("Choose a color!");
                 card.setColor(chooseColor());
                 break;
@@ -272,12 +286,12 @@ public class GameUnoController implements TurnEndCallback {
                 System.out.println("Choose a color!");
                 card.setColor(chooseColor());
                 break;
-
         }
     }
 
+
     private String chooseColor() {
-        // Implementa lógica para que el jugador elija un color
+        // logica para que el jugador elija un color
         String[] colors = {"RED", "YELLOW", "BLUE", "GREEN"};
         return colors[(int) (Math.random() * colors.length)];
     }
@@ -316,7 +330,7 @@ public class GameUnoController implements TurnEndCallback {
             return;
         }
 
-        if (!deck.isEmpty()) { // Si es el turno del jugador, puede tomar una carta
+        if (!deck.isEmpty()) { // Si es el turno del jugador puede tomar una carta
             Card newCard = this.deck.takeCard();
             this.humanPlayer.addCard(newCard);
             System.out.println("You took a card: " + newCard.getValue() + " of " +
@@ -330,7 +344,7 @@ public class GameUnoController implements TurnEndCallback {
 
     private void endPlayerTurn() {
         this.isPlayerTurn = false; // Cambia el turno al oponente
-        threadPlayMachine.setHasPlayerPlayed(true); // Permite que la máquina juegue
+        threadPlayMachine.setHasPlayerPlayed(true); // Permite que la maquina juegue
         System.out.println("Player's turn has ended. Machine is now playing.");
     }
 
