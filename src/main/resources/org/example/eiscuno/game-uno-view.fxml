@@ -50,7 +50,7 @@
                   <Insets top="10.0" />
                </HBox.margin>
             </GridPane>
-            <Button mnemonicParsing="false" text="Salir" />
+            <Button mnemonicParsing="false" text="Salir" onAction="#onHandleExit" />
          </children>
       </HBox>
    </top>

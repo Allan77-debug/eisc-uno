@@ -54,6 +54,7 @@ public class GameUnoController implements TurnEndCallback {
     @FXML
     public void initialize() {
         initVariables();
+        updateUnoButtonVisibility();
         this.gameUno.startGame();
         setButtonGraphics();
         setBackground(EISCUnoEnum.BACKGROUND_UNO.getFilePath());
@@ -110,6 +111,14 @@ public class GameUnoController implements TurnEndCallback {
         });
     }
 
+    // Method to update the visibility of uno button
+    private void updateUnoButtonVisibility() {
+        if (this.humanPlayer.getCardCount() == 1) {
+            unoButton.setVisible(true);
+        } else {
+            unoButton.setVisible(false); // Ocultar botón UNO
+        }
+    }
 
     private void initVariables() {
         this.humanPlayer = new Player("HUMAN_PLAYER");
@@ -342,6 +351,7 @@ public class GameUnoController implements TurnEndCallback {
     }
 
     private void endPlayerTurn() {
+        updateUnoButtonVisibility();
         this.isPlayerTurn = false; // Cambia el turno al oponente
         threadPlayMachine.setHasPlayerPlayed(true); // Permite que la maquina juegue
         System.out.println("Player's turn has ended. Machine is now playing.");
@@ -354,5 +364,12 @@ public class GameUnoController implements TurnEndCallback {
         } else {
             System.out.println("You cannot declare UNO!");
         }
+    }
+
+    // Method to close game
+    @FXML
+    private void onHandleExit(ActionEvent event) {
+        Platform.exit();
+        System.exit(0);
     }
 }
