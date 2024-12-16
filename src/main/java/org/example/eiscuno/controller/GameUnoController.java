@@ -67,6 +67,7 @@ public class GameUnoController implements TurnEndCallback {
         initVariables();
         updateUnoButtonVisibility();
         setupColorSelection();
+        disableColorSelection();
         this.gameUno.startGame();
         setButtonGraphics();
         setBackground(EISCUnoEnum.BACKGROUND_UNO.getFilePath());
@@ -138,12 +139,16 @@ public class GameUnoController implements TurnEndCallback {
 
     private void disableColorSelection() {
         colorComboBox.setDisable(true);
+        colorComboBox.setVisible(false);
         confirmColorButton.setDisable(true);
+        confirmColorButton.setVisible(false);
     }
 
     private void enableColorSelection() {
         colorComboBox.setDisable(false);
+        colorComboBox.setVisible(true);
         confirmColorButton.setDisable(false);
+        confirmColorButton.setVisible(true);
     }
 
 
@@ -275,15 +280,18 @@ public class GameUnoController implements TurnEndCallback {
      * @param card the card to play
      */
     private void playCard(Card card) {
+
+        table.addCardOnTheTable(card); // Agregar la carta a la mesa
+        tableImageView.setImage(card.getImage()); // Actualizar la imagen en la mesa
+        humanPlayer.removeCard(findCardIndexInHand(card)); // Eliminar la carta de la mano del jugador
+        renderHumanPlayerCards(); // Actualizar las cartas visibles del jugador
+
         if (card.isSpecial() && (card.getValue().equals("Wild") || card.getValue().equals("+4"))) {
             System.out.println("Special card played: " + card.getValue());
             enableColorSelection();
             return;
         }
 
-        table.addCardOnTheTable(card); // Agregar la carta a la mesa
-        tableImageView.setImage(card.getImage()); // Actualizar la imagen en la mesa
-        humanPlayer.removeCard(findCardIndexInHand(card)); // Eliminar la carta de la mano del jugador
         updateColorCircle(card.getColor());
 
         // Manejar efectos especiales
@@ -291,7 +299,6 @@ public class GameUnoController implements TurnEndCallback {
 
         // Si no es un turno repetido finaliza el turno
         if (!card.getValue().equals("Skip")) {
-            renderHumanPlayerCards(); // Actualizar las cartas visibles del jugador
             endPlayerTurn(); // Finalizar el turno del jugador
         }
 
@@ -299,7 +306,6 @@ public class GameUnoController implements TurnEndCallback {
             System.out.println("Player has no more cards! You win!");
         }
     }
-
 
 
     /**
@@ -371,14 +377,7 @@ public class GameUnoController implements TurnEndCallback {
         }
     }
 
-
-    private String chooseColor() {
-        // logica para que el jugador elija un color
-        String[] colors = {"RED", "YELLOW", "BLUE", "GREEN"};
-        return colors[(int) (Math.random() * colors.length)];
-    }
-
-
+    
     /**
      * Finds the index of a card in the human player's hand.
      *
