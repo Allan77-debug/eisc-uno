@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.model.game.GameUno;
@@ -40,6 +41,15 @@ public class GameUnoController implements TurnEndCallback {
     @FXML
     private BorderPane mainPane;
 
+    @FXML
+    private Circle colorCircle;
+
+    @FXML
+    private ComboBox<String> colorComboBox;
+
+    @FXML
+    private Button confirmColorButton;
+
 
     private Player humanPlayer;
     private Player machinePlayer;
@@ -48,6 +58,7 @@ public class GameUnoController implements TurnEndCallback {
     private GameUno gameUno;
     private int posInitCardToShow;
     private boolean isPlayerTurn;
+    private GameUnoController gameController;
 
     private ThreadPlayMachine threadPlayMachine;
 
@@ -55,6 +66,7 @@ public class GameUnoController implements TurnEndCallback {
     public void initialize() {
         initVariables();
         updateUnoButtonVisibility();
+        setupColorSelection();
         this.gameUno.startGame();
         setButtonGraphics();
         setBackground(EISCUnoEnum.BACKGROUND_UNO.getFilePath());
@@ -71,6 +83,10 @@ public class GameUnoController implements TurnEndCallback {
         renderMachineCards();
         renderHumanPlayerCards();
         initThreads();
+        if (colorCircle == null) {
+            throw new IllegalStateException("colorCircle no está inicializado");
+        }
+        updateColorCircle(this.table.getCurrentCardOnTheTable().getColor());
     }
 
     // Configurar las imagenes de los botones
@@ -101,6 +117,60 @@ public class GameUnoController implements TurnEndCallback {
 
         mainPane.setBackground(new Background(background));
     }
+
+    private void setupColorSelection() {
+        // Configura los colores disponibles en el ComboBox
+        colorComboBox.getItems().addAll("RED", "YELLOW", "BLUE", "GREEN");
+        colorComboBox.setDisable(true); // Deshabilitar inicialmente
+        confirmColorButton.setDisable(true); // Deshabilitar inicialmente
+
+        confirmColorButton.setOnAction(event -> {
+            String selectedColor = colorComboBox.getValue();
+            if (selectedColor != null) {
+                System.out.println("Player selected color: " + selectedColor);
+                table.getCurrentCardOnTheTable().setColor(selectedColor);
+                updateColorCircle(selectedColor);
+                disableColorSelection(); // Deshabilitar selección después de confirmar
+                endPlayerTurn(); // Finalizar turno después de elegir el color
+            }
+        });
+    }
+
+    private void disableColorSelection() {
+        colorComboBox.setDisable(true);
+        confirmColorButton.setDisable(true);
+    }
+
+    private void enableColorSelection() {
+        colorComboBox.setDisable(false);
+        confirmColorButton.setDisable(false);
+    }
+
+
+    public void updateColorCircle(String color) {
+        if (color == null) {
+            color = "BLACK"; // Asigna un valor por defecto cuando el color es null
+        }
+
+        switch (color) {
+            case "RED":
+                colorCircle.setFill(javafx.scene.paint.Color.RED);
+                break;
+            case "YELLOW":
+                colorCircle.setFill(javafx.scene.paint.Color.YELLOW);
+                break;
+            case "BLUE":
+                colorCircle.setFill(javafx.scene.paint.Color.BLUE);
+                break;
+            case "GREEN":
+                colorCircle.setFill(javafx.scene.paint.Color.GREEN);
+                break;
+            default:
+                colorCircle.setFill(javafx.scene.paint.Color.BLACK); // Color por defecto
+                break;
+        }
+    }
+
 
     @Override
     public void onMachineTurnEnd() {
@@ -134,7 +204,8 @@ public class GameUnoController implements TurnEndCallback {
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
 
-        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.humanPlayer, this.deck, this.tableImageView, this);
+        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.humanPlayer,
+                this.deck, this.tableImageView, this, this);
         threadPlayMachine.start();
     }
 
@@ -205,14 +276,15 @@ public class GameUnoController implements TurnEndCallback {
      */
     private void playCard(Card card) {
         if (card.isSpecial() && (card.getValue().equals("Wild") || card.getValue().equals("+4"))) {
-            String chosenColor = chooseColor(); // Interfaz para elegir color
-            card.setColor(chosenColor);
-            System.out.println("Chosen color: " + chosenColor);
+            System.out.println("Special card played: " + card.getValue());
+            enableColorSelection();
+            return;
         }
 
         table.addCardOnTheTable(card); // Agregar la carta a la mesa
         tableImageView.setImage(card.getImage()); // Actualizar la imagen en la mesa
         humanPlayer.removeCard(findCardIndexInHand(card)); // Eliminar la carta de la mano del jugador
+        updateColorCircle(card.getColor());
 
         // Manejar efectos especiales
         handleSpecialCard(card);
@@ -221,6 +293,10 @@ public class GameUnoController implements TurnEndCallback {
         if (!card.getValue().equals("Skip")) {
             renderHumanPlayerCards(); // Actualizar las cartas visibles del jugador
             endPlayerTurn(); // Finalizar el turno del jugador
+        }
+
+        if (humanPlayer.getCardCount() == 0) {
+            System.out.println("Player has no more cards! You win!");
         }
     }
 
@@ -288,11 +364,9 @@ public class GameUnoController implements TurnEndCallback {
                     }
                 }
                 System.out.println("Choose a color!");
-                card.setColor(chooseColor());
                 break;
             case "Wild": // Cambio de color
                 System.out.println("Choose a color!");
-                card.setColor(chooseColor());
                 break;
         }
     }
@@ -352,6 +426,10 @@ public class GameUnoController implements TurnEndCallback {
 
     private void endPlayerTurn() {
         updateUnoButtonVisibility();
+        if (humanPlayer.getCardCount() == 0) {
+            System.out.println("Player has no more cards! You win!");
+            return;
+        }
         this.isPlayerTurn = false; // Cambia el turno al oponente
         threadPlayMachine.setHasPlayerPlayed(true); // Permite que la maquina juegue
         System.out.println("Player's turn has ended. Machine is now playing.");
@@ -362,9 +440,10 @@ public class GameUnoController implements TurnEndCallback {
         if (this.humanPlayer.getCardsPlayer().size() == 1) {
             System.out.println("Player says UNO!");
         } else {
-            System.out.println("You cannot declare UNO!");
+            System.out.println("You cannot declare UNO! You have " + this.humanPlayer.getCardsPlayer().size() + " cards.");
         }
     }
+
 
     // Method to close game
     @FXML
