@@ -20,6 +20,8 @@ import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.unoenum.EISCUnoEnum;
 
+import java.util.Objects;
+
 public class GameUnoController implements TurnEndCallback {
 
     @FXML
@@ -53,11 +55,19 @@ public class GameUnoController implements TurnEndCallback {
 
     @FXML
     public void initialize() {
+        Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResource("/org/example/eiscuno/images/gamebg.png")).toExternalForm());
+        BackgroundImage background = new BackgroundImage(
+                backgroundImage,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(100, 100, true, true, true, true));
+        mainPane.setBackground(new Background(background));
         initVariables();
         updateUnoButtonVisibility();
         this.gameUno.startGame();
         setButtonGraphics();
-        setBackground(EISCUnoEnum.BACKGROUND_UNO.getFilePath());
+        //setBackground(EISCUnoEnum.BACKGROUND_UNO.getFilePath());
         this.isPlayerTurn = true;
 
         // Mostrar la carta inicial en la mesa
