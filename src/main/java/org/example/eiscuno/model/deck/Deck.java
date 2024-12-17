@@ -10,22 +10,24 @@ import java.util.Stack;
  * Represents a deck of Uno cards.
  */
 public class Deck {
-    private final Stack<Card> deckOfCards;
+    private final Stack<Card> deckOfCards; // Baraja principal
+    private final Stack<Card> discardPile; // Pila de descarte
 
     /**
      * Constructs a new deck of Uno cards and initializes it.
      */
     public Deck() {
         deckOfCards = new Stack<>();
+        discardPile = new Stack<>();
+
         initializeDeck();
         System.out.println("Deck initialized with " + deckOfCards.size() + " cards.");
     }
 
-
     /**
      * Initializes the deck with cards based on the EISCUnoEnum values.
      */
-    private void initializeDeck() {
+    public void initializeDeck() {
         for (EISCUnoEnum cardEnum : EISCUnoEnum.values()) {
             String value = getCardValue(cardEnum.name());
             String color = getCardColor(cardEnum.name());
@@ -42,24 +44,21 @@ public class Deck {
             }
 
             Card card = new Card(cardEnum.getFilePath(), value, color);
-            System.out.println("Adding card: " + value + " of " + (color != null ? color : "ANY"));
             deckOfCards.push(card);
         }
         Collections.shuffle(deckOfCards);
     }
-
-
 
     private String getCardValue(String name) {
         if (name.endsWith("0")) {
             return "0";
         } else if (name.endsWith("1")) {
             return "1";
-        } else if (name.endsWith("2") && !name.contains("WILD_DRAW")) { // Diferenciar "+2" de números
+        } else if (name.endsWith("2") && !name.contains("WILD_DRAW")) {
             return "2";
         } else if (name.endsWith("3")) {
             return "3";
-        } else if (name.endsWith("4") && !name.equals("FOUR_WILD_DRAW")) { // Diferenciar "+4"
+        } else if (name.endsWith("4") && !name.equals("FOUR_WILD_DRAW")) {
             return "4";
         } else if (name.endsWith("5")) {
             return "5";
@@ -86,15 +85,14 @@ public class Deck {
         }
     }
 
-
     private String getCardColor(String name) {
-        if(name.startsWith("GREEN")){
+        if (name.startsWith("GREEN")) {
             return "GREEN";
-        } else if(name.startsWith("YELLOW")){
+        } else if (name.startsWith("YELLOW")) {
             return "YELLOW";
-        } else if(name.startsWith("BLUE")){
+        } else if (name.startsWith("BLUE")) {
             return "BLUE";
-        } else if(name.startsWith("RED")){
+        } else if (name.startsWith("RED")) {
             return "RED";
         } else if (name.endsWith("GREEN")) {
             return "GREEN";
@@ -109,27 +107,56 @@ public class Deck {
         }
     }
 
+    /**
+     * Adds a card to the discard pile.
+     * @param card the card to add
+     */
+    public void addToDiscardPile(Card card) {
+        discardPile.push(card);
+        System.out.println("Card added to discard pile: " + card.getValue() + " of " + card.getColor());
+    }
+
+    /**
+     * Reshuffles the deck using the discard pile, leaving the last card.
+     */
+    public void reshuffleDeck() {
+        if (discardPile.isEmpty()) {
+            throw new IllegalStateException("No cards to reshuffle.");
+        }
+
+        System.out.println("Reshuffling the deck with discard pile...");
+        Card lastCard = discardPile.pop(); // Keep the last card on the table
+
+        while (!discardPile.isEmpty()) {
+            deckOfCards.push(discardPile.pop());
+        }
+
+        Collections.shuffle(deckOfCards);
+        discardPile.push(lastCard); // Put the last card back on the discard pile
+        System.out.println("Deck reshuffled. Remaining cards: " + deckOfCards.size());
+    }
 
     /**
      * Takes a card from the top of the deck.
-     *
      * @return the card from the top of the deck
-     * @throws IllegalStateException if the deck is empty
      */
     public Card takeCard() {
         if (deckOfCards.isEmpty()) {
-            throw new IllegalStateException("No hay más cartas en el mazo.");
+            reshuffleDeck();
         }
+
+        if (deckOfCards.isEmpty()) {
+            throw new IllegalStateException("No cards left to draw.");
+        }
+
         Card card = deckOfCards.pop();
         System.out.println("Card taken: " + card.getValue() + " of " +
                 (card.getColor() != null ? card.getColor() : "ANY") + ". Remaining cards: " + deckOfCards.size());
         return card;
     }
 
-
     /**
      * Checks if the deck is empty.
-     *
      * @return true if the deck is empty, false otherwise
      */
     public boolean isEmpty() {

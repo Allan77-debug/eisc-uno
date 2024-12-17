@@ -42,8 +42,12 @@ public class GameUno implements IGameUno {
             machinePlayer.addCard(this.deck.takeCard());
         }
 
-        // Colocar una carta inicial en la mesa
-        Card initialCard = this.deck.takeCard();
+        // Colocar una carta inicial en la mesa que no sea especial
+        Card initialCard;
+        do {
+            initialCard = this.deck.takeCard();
+        } while (initialCard.isSpecial());
+
         this.table.addCardOnTheTable(initialCard);
     }
 

@@ -1,6 +1,9 @@
 package org.example.eiscuno.model.machine;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.image.ImageView;
+import org.example.eiscuno.controller.GameUnoController;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
@@ -18,8 +21,10 @@ public class ThreadPlayMachine extends Thread {
     private final TurnEndCallback callback;
     private final Player humanPlayer; // Nueva referencia
     private static final Logger LOGGER = Logger.getLogger(ThreadPlayMachine.class.getName());
+    private final GameUnoController gameController;
 
-    public ThreadPlayMachine(Table table, Player machinePlayer, Player humanPlayer, Deck deck, ImageView tableImageView, TurnEndCallback callback) {
+    public ThreadPlayMachine(Table table, Player machinePlayer, Player humanPlayer, Deck deck,
+                             ImageView tableImageView, TurnEndCallback callback, GameUnoController gameController) {
         this.table = table;
         this.machinePlayer = machinePlayer;
         this.deck = deck;
@@ -27,6 +32,7 @@ public class ThreadPlayMachine extends Thread {
         this.humanPlayer = humanPlayer;
         this.hasPlayerPlayed = false;
         this.callback = callback;
+        this.gameController = gameController;
     }
 
     @Override
@@ -65,23 +71,31 @@ public class ThreadPlayMachine extends Thread {
             if (cardToPlay != null) {
                 System.out.println("Machine plays a card: " + cardToPlay.getValue() +
                         (cardToPlay.getColor() != null ? " of " + cardToPlay.getColor() : ""));
+                gameController.updateColorCircle(cardToPlay.getColor());
                 table.addCardOnTheTable(cardToPlay); // Jugar la carta
                 tableImageView.setImage(cardToPlay.getImage());
                 machinePlayer.removeCard(machinePlayer.getCardsPlayer().indexOf(cardToPlay));
+                deck.addToDiscardPile(cardToPlay); // Agregar la carta al mazo de descarte
 
                 // Manejar efectos de cartas especiales
                 if (cardToPlay.isSpecial()) {
                     handleSpecialCardEffect(cardToPlay);
                 }
-            } else { // No tiene cartas jugables
+
+            }
+            else { // No tiene cartas jugables
                 if (!deck.isEmpty()) { // Solo toma una carta si el mazo no está vacío
                     Card newCard = deck.takeCard();
                     machinePlayer.addCard(newCard);
                     System.out.println("Machine takes a card: " + newCard.getValue() + " of " +
                             (newCard.getColor() != null ? newCard.getColor() : "ANY"));
                 } else {
-                    System.out.println("Deck is empty. Machine skips turn.");
+                    deck.reshuffleDeck();
                 }
+            }
+
+            if (machinePlayer.getCardCount() == 0) {
+                showWinAlert();
             }
 
             // Actualiza las cartas de la máquina en la interfaz
@@ -91,6 +105,17 @@ public class ThreadPlayMachine extends Thread {
 
 
         } while (skipTurn); // Si skipTurn es true repetir el turno
+    }
+
+    private void showWinAlert() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("¡Derrota!");
+            alert.setContentText("Has perdido. El juego se reiniciará.");
+            alert.showAndWait();
+
+            gameController.resetGame();
+        });
     }
 
 
@@ -123,12 +148,14 @@ public class ThreadPlayMachine extends Thread {
                 String newColor = chooseRandomColor();
                 table.getCurrentCardOnTheTable().setColor(newColor); // Cambiar color en la mesa
                 System.out.println("New color: " + newColor);
+                gameController.updateColorCircle(newColor);
                 break;
             case "Wild":
                 System.out.println("Machine chooses a color!");
                 String chosenColor = chooseRandomColor();
                 table.getCurrentCardOnTheTable().setColor(chosenColor); // Cambiar color en la mesa
                 System.out.println("New color: " + chosenColor);
+                gameController.updateColorCircle(chosenColor);
                 break;
         }
     }
