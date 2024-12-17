@@ -67,6 +67,10 @@ public class GameUnoController implements TurnEndCallback {
 
     private ThreadPlayMachine threadPlayMachine;
 
+    /**
+     * Initialize the Game Controller and methods
+     *
+     */
     @FXML
     public void initialize() {
         initVariables();
@@ -78,7 +82,7 @@ public class GameUnoController implements TurnEndCallback {
         setBackground(EISCUnoEnum.BACKGROUND_UNO.getFilePath());
         this.isPlayerTurn = true;
 
-        // Mostrar la carta inicial en la mesa
+        // Show the initial card on the table
         try {
             Card initialCard = this.table.getCurrentCardOnTheTable();
             this.tableImageView.setImage(initialCard.getImage());
@@ -95,7 +99,9 @@ public class GameUnoController implements TurnEndCallback {
         updateColorCircle(this.table.getCurrentCardOnTheTable().getColor());
     }
 
-    // Configurar las imagenes de los botones
+    /**
+     * Configure the images into buttons
+     */
     private void setButtonGraphics() {
         Image deckImage = new Image(getClass().getResource(EISCUnoEnum.DECK_OF_CARDS.getFilePath()).toString());
         ImageView deckImageView = new ImageView(deckImage);
@@ -110,6 +116,10 @@ public class GameUnoController implements TurnEndCallback {
         unoButton.setGraphic(unoImageView);
     }
 
+    /**
+     * Setting background image to scene
+     * @param backgroundPath Path of image
+     */
     private void setBackground(String backgroundPath) {
         Image backgroundImage = new Image(getClass().getResource(backgroundPath).toString());
 
@@ -124,6 +134,9 @@ public class GameUnoController implements TurnEndCallback {
         mainPane.setBackground(new Background(background));
     }
 
+    /**
+     * Setting color that user choosed in the game
+     */
     private void setupColorSelection() {
         // Configura los colores disponibles en el ComboBox
         colorComboBox.getItems().addAll("RED", "YELLOW", "BLUE", "GREEN");
@@ -142,6 +155,9 @@ public class GameUnoController implements TurnEndCallback {
         });
     }
 
+    /**
+     * Disable select to choose color
+     */
     private void disableColorSelection() {
         colorComboBox.setDisable(true);
         colorComboBox.setVisible(false);
@@ -149,6 +165,9 @@ public class GameUnoController implements TurnEndCallback {
         confirmColorButton.setVisible(false);
     }
 
+    /**
+     * Show select to choose color
+     */
     private void enableColorSelection() {
         colorComboBox.setDisable(false);
         colorComboBox.setVisible(true);
@@ -156,7 +175,10 @@ public class GameUnoController implements TurnEndCallback {
         confirmColorButton.setVisible(true);
     }
 
-
+    /**
+     * Update color of circle color in the game
+     * @param color String of color options
+     */
     public void updateColorCircle(String color) {
         if (color == null) {
             color = "BLACK"; // Asigna un valor por defecto cuando el color es null
@@ -181,7 +203,9 @@ public class GameUnoController implements TurnEndCallback {
         }
     }
 
-
+    /**
+     * The machine completed turn
+     */
     @Override
     public void onMachineTurnEnd() {
         Platform.runLater(() -> {
@@ -191,7 +215,9 @@ public class GameUnoController implements TurnEndCallback {
         });
     }
 
-    // Method to update the visibility of uno button
+    /**
+     * Method for update uno button change of status
+     */
     private void updateUnoButtonVisibility() {
         if (this.humanPlayer.getCardCount() == 1) {
             unoButton.setVisible(true);
@@ -200,6 +226,9 @@ public class GameUnoController implements TurnEndCallback {
         }
     }
 
+    /**
+     * Initialize differents vars of game
+     */
     private void initVariables() {
         this.humanPlayer = new Player("HUMAN_PLAYER");
         this.machinePlayer = new Player("MACHINE_PLAYER");
@@ -209,11 +238,13 @@ public class GameUnoController implements TurnEndCallback {
         this.posInitCardToShow = 0;
     }
 
+    /**
+     * Initialize the threads used on game
+     */
     private void initThreads() {
         ThreadSingUNOMachine threadSingUNOMachine = new ThreadSingUNOMachine(this.humanPlayer.getCardsPlayer());
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
-
         threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.humanPlayer,
                 this.deck, this.tableImageView, this, this);
         threadPlayMachine.start();
@@ -281,15 +312,14 @@ public class GameUnoController implements TurnEndCallback {
 
     /**
      * Plays a card and updates the game state.
-     *
      * @param card the card to play
      */
     private void playCard(Card card) {
 
-        table.addCardOnTheTable(card); // Agregar la carta a la mesa
-        tableImageView.setImage(card.getImage()); // Actualizar la imagen en la mesa
-        humanPlayer.removeCard(findCardIndexInHand(card)); // Eliminar la carta de la mano del jugador
-        renderHumanPlayerCards(); // Actualizar las cartas visibles del jugador
+        table.addCardOnTheTable(card); // Add card on the table
+        tableImageView.setImage(card.getImage()); // Update image of card
+        humanPlayer.removeCard(findCardIndexInHand(card)); // Delete card of hand player
+        renderHumanPlayerCards(); // Update the visible cards of user
         deck.addToDiscardPile(card);
 
         if (card.isSpecial() && (card.getValue().equals("Wild") || card.getValue().equals("+4"))) {
@@ -297,27 +327,27 @@ public class GameUnoController implements TurnEndCallback {
             enableColorSelection();
             return;
         }
-
         updateColorCircle(card.getColor());
-
-        // Manejar efectos especiales
         handleSpecialCard(card);
 
-        // Si no es un turno repetido finaliza el turno
+        // If donot repeat turn, skip it
         if (!card.getValue().equals("Skip")) {
             endPlayerTurn(); // Finalizar el turno del jugador
         }
 
         if (humanPlayer.getCardCount() == 1) {
             System.out.println("Player has only one card left! Starting UNO timer...");
-            startUnoTimer(); // Iniciar el temporizador de UNO
+            startUnoTimer(); // Start counter of UNO
         }
 
         if (humanPlayer.getCardCount() == 0) {
-            showWinAlert(); // Mostrar alerta y reiniciar juego
+            showWinAlert(); // Show alert en reset game
         }
     }
 
+    /**
+     * Show the alert when there winner of the game
+     */
     private void showWinAlert() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -326,23 +356,22 @@ public class GameUnoController implements TurnEndCallback {
             alert.setContentText("Has ganado la partida. El juego se reiniciará.");
             alert.showAndWait();
 
-            resetGame(); // Reiniciar el juego después de mostrar la alerta
+            resetGame(); // Reset game after show alert
         });
     }
 
+    /**
+     * Reset game and prepare all elements again
+     */
     public void resetGame() {
-        // Inicializa el mazo y la mesa
-        this.deck = new Deck();  // Crea un nuevo mazo y lo inicializa automáticamente
-        this.table = new Table();  // Crea la mesa vacía
+        // Initialaze table and cards
+        this.deck = new Deck();
+        this.table = new Table();
 
-        // Inicializa los jugadores
+        // Initialize players and game
         this.humanPlayer = new Player("HUMAN_PLAYER");
         this.machinePlayer = new Player("MACHINE_PLAYER");
-
-        // Inicializa el juego
         this.gameUno = new GameUno(this.humanPlayer, this.machinePlayer, this.deck, this.table);
-
-
         this.gameUno.startGame();
         try {
             Card initialCard = this.table.getCurrentCardOnTheTable();
@@ -351,56 +380,50 @@ public class GameUnoController implements TurnEndCallback {
             System.out.println("Error inicializando la mesa: " + e.getMessage());
         }
 
-        // Reinicia las variables de estado del juego
+        // Reset variables
         this.posInitCardToShow = 0;
         this.isPlayerTurn = true;
-
-        // Actualiza la visibilidad del botón UNO
         updateUnoButtonVisibility();
-
-        // Deshabilita la selección de color
         disableColorSelection();
 
-        // Renderiza las cartas de los jugadores
         renderMachineCards();
         renderHumanPlayerCards();
 
-        // Reinicia los hilos
         initThreads();
-
         System.out.println("El juego se ha reiniciado.");
     }
 
 
     /**
      * Checks if a card can be played based on the current table card.
-     *
      * @param card the card to check
      * @return true if the card can be played, false otherwise
      */
     private boolean canPlayCard(Card card) {
         Card topCard = this.table.getCurrentCardOnTheTable();
 
-        // Permitir jugar cartas del mismo color
+        // Allow play cards same color
         if (topCard.getColor() != null && card.getColor() != null && card.getColor().equals(topCard.getColor())) {
             return true;
         }
 
-        // Permitir jugar cartas con el mismo valor (incluidas cartas especiales)
+        // Allow play card with same value (Include special cards)
         if (card.getValue().equals(topCard.getValue())) {
             return true;
         }
 
-        // Permitir jugar "Wild" y "+4" en cualquier momento
+        // Allow play "Wild" and "+4" in any moment
         if (card.isSpecial() && (card.getValue().equals("Wild") || card.getValue().equals("+4"))) {
             return true;
         }
-
-        // La carta no es jugable
+        // The card isnot playable
         return false;
     }
 
-
+    /**
+     * Method to know what is the special card
+     * @param card card to evalue
+     */
     private void handleSpecialCard(Card card) {
         switch (card.getValue()) {
             case "Skip": // Ceder turno
@@ -452,6 +475,10 @@ public class GameUnoController implements TurnEndCallback {
         return this.humanPlayer.getCardsPlayer().indexOf(card);
     }
 
+    /**
+     * Handles the action of moving back to the previous set of cards.
+     * @param event the action event triggered by the back button
+     */
     @FXML
     void onHandleBack(ActionEvent event) {
         if (this.posInitCardToShow > 0) {
@@ -460,6 +487,10 @@ public class GameUnoController implements TurnEndCallback {
         }
     }
 
+    /**
+     * Handles the action of moving to the next set of cards.
+     * @param event the action event triggered by the next button
+     */
     @FXML
     void onHandleNext(ActionEvent event) {
         if (this.posInitCardToShow < this.humanPlayer.getCardsPlayer().size() - 4) {
@@ -468,59 +499,73 @@ public class GameUnoController implements TurnEndCallback {
         }
     }
 
+    /**
+     * Handles the action of taking a card from the deck.
+     * @param event the action event triggered by the take card button
+     */
     @FXML
     void onHandleTakeCard(ActionEvent event) {
-        if (!isPlayerTurn) { // Verificar si no es el turno del jugador
+        if (!isPlayerTurn) { // Check if it's not the player's turn
             System.out.println("You cannot take a card. It's not your turn!");
             return;
         }
 
-        if (!deck.isEmpty()) { // Si es el turno del jugador puede tomar una carta
+        if (!deck.isEmpty()) { // If it's the player's turn, they can take a card
             Card newCard = this.deck.takeCard();
             this.humanPlayer.addCard(newCard);
             System.out.println("You took a card: " + newCard.getValue() + " of " +
                     (newCard.getColor() != null ? newCard.getColor() : "ANY"));
             renderHumanPlayerCards();
-            endPlayerTurn(); // Finaliza el turno del jugador después de tomar una carta
+            endPlayerTurn(); // End the player's turn after taking a card
         } else {
             deck.reshuffleDeck();
         }
     }
 
+    /**
+     * Ends the player's turn and updates the game state accordingly.
+     */
     private void endPlayerTurn() {
         updateUnoButtonVisibility();
         if (humanPlayer.getCardCount() == 0) {
             System.out.println("Player has no more cards! You win!");
             return;
         }
-        this.isPlayerTurn = false; // Cambia el turno al oponente
-        threadPlayMachine.setHasPlayerPlayed(true); // Permite que la maquina juegue
+        this.isPlayerTurn = false; // Change the turn to the opponent
+        threadPlayMachine.setHasPlayerPlayed(true); // Allow the machine to play
         System.out.println("Player's turn has ended. Machine is now playing.");
     }
 
+    /**
+     * Handles the action of pressing the UNO button.
+     * @param event the action event triggered by the UNO button
+     */
     @FXML
     void onHandleUno(ActionEvent event) {
         if (this.humanPlayer.getCardCount() == 1) {
             System.out.println("UNO button pressed in time!");
             if (unoTimer != null) {
-                unoTimer.stop(); // Detener el temporizador si presionó el botón
+                unoTimer.stop(); // Stop the timer if the button was pressed
             }
         } else {
             System.out.println("You can't press UNO now! You have more than one card.");
         }
     }
 
+    /**
+     * Starts the UNO timer with a random delay.
+     */
     private void startUnoTimer() {
         if (unoTimer != null) {
-            unoTimer.stop(); // Detiene el temporizador previo si existiera
+            unoTimer.stop(); // Stop any previous timer if it exists
         }
 
-        // Crear un tiempo aleatorio entre 2 y 4 segundos
+        // Create a random delay between 2 and 4 seconds
         int randomTime = 2000 + (int) (Math.random() * 2000);
 
         unoTimer = new PauseTransition(Duration.millis(randomTime));
         unoTimer.setOnFinished(event -> {
-            // Penalización si el jugador no presionó el botón UNO
+            // Penalty if the player did not press the UNO button in time
             if (this.humanPlayer.getCardCount() == 1) {
                 System.out.println("You didn't press UNO in time! Taking a penalty card...");
                 Platform.runLater(() -> {
@@ -530,10 +575,12 @@ public class GameUnoController implements TurnEndCallback {
             }
         });
 
-        unoTimer.play(); // Iniciar el temporizador
+        unoTimer.play(); // Start the timer
     }
 
-    // Método para tomar una carta como penalización
+    /**
+     * Takes a penalty card if the player fails to press the UNO button in time.
+     */
     private void takePenaltyCard() {
         if (!deck.isEmpty()) {
             Card penaltyCard = deck.takeCard();
@@ -544,11 +591,14 @@ public class GameUnoController implements TurnEndCallback {
         }
     }
 
-
-    // Method to close game
+    /**
+     * Handles the action of exiting the game.
+     * @param event the action event triggered by the exit button
+     */
     @FXML
     private void onHandleExit(ActionEvent event) {
         Platform.exit();
         System.exit(0);
     }
+
 }

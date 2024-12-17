@@ -13,7 +13,6 @@ public class ThreadSingUNOMachine implements Runnable {
 
     /**
      * Constructor for `ThreadSingUNOMachine`.
-     *
      * @param cardsPlayer the list of cards held by the human player
      */
     public ThreadSingUNOMachine(ArrayList<Card> cardsPlayer) {
