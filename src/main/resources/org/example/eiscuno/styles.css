@@ -4,3 +4,8 @@
     -fx-border-color: transparent;    /* Sin borde */
     -fx-padding: 0;                   /* Sin relleno */
 }
+.body {
+    -fx-background-image: url("/org/example/eiscuno/images/unobg.png");
+    -fx-background-size: cover; /* Ajusta la imagen al tamaño del Pane */
+
+}
