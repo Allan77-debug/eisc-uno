@@ -33,7 +33,7 @@ public class GameUnoController implements TurnEndCallback {
     private GridPane gridPaneCardsMachine;
 
     @FXML
-    private GridPane gridPaneCardsPlayer;
+    GridPane gridPaneCardsPlayer;
 
     @FXML
     private ImageView tableImageView;
@@ -63,7 +63,7 @@ public class GameUnoController implements TurnEndCallback {
     private Player machinePlayer;
     private Deck deck;
     private Table table;
-    private GameUno gameUno;
+    GameUno gameUno;
     private int posInitCardToShow;
     private boolean isPlayerTurn;
     private GameUnoController gameController;
