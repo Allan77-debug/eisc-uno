@@ -67,7 +67,7 @@ public class GameUnoController implements TurnEndCallback {
         updateUnoButtonVisibility();
         this.gameUno.startGame();
         setButtonGraphics();
-        //setBackground(EISCUnoEnum.BACKGROUND_UNO.getFilePath());
+
         this.isPlayerTurn = true;
 
         // Mostrar la carta inicial en la mesa
@@ -98,19 +98,6 @@ public class GameUnoController implements TurnEndCallback {
         unoButton.setGraphic(unoImageView);
     }
 
-    private void setBackground(String backgroundPath) {
-        Image backgroundImage = new Image(getClass().getResource(backgroundPath).toString());
-
-        BackgroundImage background = new BackgroundImage(
-                backgroundImage,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                new BackgroundSize(100, 100, true, true, false, true)
-        );
-
-        mainPane.setBackground(new Background(background));
-    }
 
     @Override
     public void onMachineTurnEnd() {
