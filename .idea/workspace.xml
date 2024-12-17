@@ -5,10 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1ee8ff40-bbdd-4aec-a3d2-cf5cc45130ec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/eiscuno/model/machine/ThreadPlayMachine.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/eiscuno/model/machine/ThreadSingUNOMachine.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/example/eiscuno/model/card/CardTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/example/eiscuno/model/card/dummy-image.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/eiscuno/controller/GameUnoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/eiscuno/controller/GameUnoController.java" afterDir="false" />
+>>>>>>> adf1ab36593fb3c4f327c49a698242dfea1d7f81
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,13 +25,26 @@
       <list>
         <option value="JavaFXApplication" />
         <option value="Enum" />
-        <option value="CSS File" />
         <option value="Interface" />
+        <option value="CSS File" />
+<<<<<<< HEAD
+=======
         <option value="Class" />
+>>>>>>> adf1ab36593fb3c4f327c49a698242dfea1d7f81
+        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+<<<<<<< HEAD
+        <entry key="$PROJECT_DIR$" value="develop" />
+=======
+        <entry key="$PROJECT_DIR$" value="DCO" />
+>>>>>>> adf1ab36593fb3c4f327c49a698242dfea1d7f81
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -38,7 +56,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/fabiansvc/eisc-uno.git&quot;,
-    &quot;accountId&quot;: &quot;0c82e6b4-a45c-4190-a110-02ef4a3ff1b6&quot;
+    &quot;accountId&quot;: &quot;c99a9616-b449-4c74-b8d0-1bb7b16f3b11&quot;
   }
 }</component>
   <component name="MavenImportPreferences">
@@ -62,13 +80,18 @@
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "Application.HelloApplication.executor": "Run",
     "Application.Main.executor": "Run",
+<<<<<<< HEAD
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
+    "git-widget-placeholder": "DCO",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Fabian/Documents/eisc-uno",
+    "last_opened_file_path": "E:/UNI/UNO/eisc-uno",
+=======
+>>>>>>> adf1ab36593fb3c4f327c49a698242dfea1d7f81
     "list.type.of.created.stylesheet": "CSS",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -80,36 +103,131 @@
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Juanc\eisc-uno\src\test\java\org\example\eiscuno\model\card" />
+      <recent name="C:\Users\Juanc\eisc-uno\src\main\resources\org\example\eiscuno\audio" />
+      <recent name="C:\Users\Juanc\eisc-uno\src\main\resources\org\example\eiscuno\images" />
+      <recent name="C:\Users\Juanc\eisc-uno\src\main\resources\org\example\eiscuno" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\fsvc1\Coding\eisc-uno\src\main\resources\org\example\eiscuno" />
       <recent name="C:\Users\fsvc1\Coding\eisc-uno\src\main\resources\org\example\eiscuno\images" />
       <recent name="C:\Users\fsvc1\Coding\eisc-uno\src" />
     </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+<<<<<<< HEAD
+      <recent name="org.example.eiscuno.model.table" />
+      <recent name="org.example.eiscuno.model.deck" />
+      <recent name="org.example.eiscuno.model.card" />
+=======
+      <recent name="org.example.eiscuno.model.card" />
+      <recent name="org.example.eiscuno.model.deck" />
+      <recent name="org.example.eiscuno.controller" />
+>>>>>>> adf1ab36593fb3c4f327c49a698242dfea1d7f81
+    </key>
   </component>
-  <component name="RunManager">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.Main" />
+  <component name="RunManager" selected="JUnit.CardTest">
+    <configuration name="CardTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="eisc-uno" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.example.eiscuno.*" />
+          <option name="PATTERN" value="org.example.eiscuno.model.card.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.card" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.card.CardTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CardTest.testNonSpecialCard" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="eisc-uno" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.eiscuno.model.card.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.card" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.card.CardTest" />
+      <option name="METHOD_NAME" value="testNonSpecialCard" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CardTest.testSetColor" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="eisc-uno" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.eiscuno.model.card.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.card" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.card.CardTest" />
+      <option name="METHOD_NAME" value="testSetColor" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CardTest.testSpecialCard" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="eisc-uno" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.eiscuno.model.card.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.card" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.card.CardTest" />
+      <option name="METHOD_NAME" value="testSpecialCard" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DeckTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="eisc-uno" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.eiscuno.model.deck.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.deck" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.deck.DeckTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
+<<<<<<< HEAD
         <item itemvalue="Application.Main" />
+        <item itemvalue="Application.Main" />
+=======
+        <item itemvalue="JUnit.CardTest" />
+        <item itemvalue="JUnit.CardTest.testSetColor" />
+        <item itemvalue="JUnit.CardTest.testNonSpecialCard" />
+        <item itemvalue="JUnit.CardTest.testSpecialCard" />
+        <item itemvalue="JUnit.DeckTest" />
+>>>>>>> adf1ab36593fb3c4f327c49a698242dfea1d7f81
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="jdk-17.0.10-corretto-17.0.10-4caba194b151-5cd809f4" />
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.18034.62" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.18034.62" />
       </set>
     </attachedChunks>
   </component>
@@ -143,10 +261,23 @@
       <workItem from="1717853787588" duration="7091000" />
       <workItem from="1732204398035" duration="285000" />
       <workItem from="1732739883028" duration="1056000" />
+      <workItem from="1733756314432" duration="18536000" />
+      <workItem from="1733839810319" duration="24716000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

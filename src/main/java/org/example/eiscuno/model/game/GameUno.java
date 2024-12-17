@@ -18,7 +18,6 @@ public class GameUno implements IGameUno {
 
     /**
      * Constructs a new GameUno instance.
-     *
      * @param humanPlayer   The human player participating in the game.
      * @param machinePlayer The machine player participating in the game.
      * @param deck          The deck of cards used in the game.
@@ -37,18 +36,24 @@ public class GameUno implements IGameUno {
      */
     @Override
     public void startGame() {
-        for (int i = 0; i < 10; i++) {
-            if (i < 5) {
-                humanPlayer.addCard(this.deck.takeCard());
-            } else {
-                machinePlayer.addCard(this.deck.takeCard());
-            }
+        for (int i = 0; i < 5; i++) {
+            humanPlayer.addCard(this.deck.takeCard());
+            machinePlayer.addCard(this.deck.takeCard());
         }
+
+        // Colocar una carta inicial en la mesa que no sea especial
+        Card initialCard;
+        do {
+            initialCard = this.deck.takeCard();
+        } while (initialCard.isSpecial());
+
+        this.table.addCardOnTheTable(initialCard);
     }
+
+
 
     /**
      * Allows a player to draw a specified number of cards from the deck.
-     *
      * @param player        The player who will draw cards.
      * @param numberOfCards The number of cards to draw.
      */
@@ -61,7 +66,6 @@ public class GameUno implements IGameUno {
 
     /**
      * Places a card on the table during the game.
-     *
      * @param card The card to be placed on the table.
      */
     @Override
@@ -71,7 +75,6 @@ public class GameUno implements IGameUno {
 
     /**
      * Handles the scenario when a player shouts "Uno", forcing the other player to draw a card.
-     *
      * @param playerWhoSang The player who shouted "Uno".
      */
     @Override
@@ -84,27 +87,44 @@ public class GameUno implements IGameUno {
     }
 
     /**
-     * Retrieves the current visible cards of the human player starting from a specific position.
-     *
+     * Retrieves the current visible cards for any player starting from a specific position.
+     * @param player The player whose cards are to be retrieved.
      * @param posInitCardToShow The initial position of the cards to show.
-     * @return An array of cards visible to the human player.
+     * @return An array of cards visible to the player.
      */
-    @Override
-    public Card[] getCurrentVisibleCardsHumanPlayer(int posInitCardToShow) {
-        int totalCards = this.humanPlayer.getCardsPlayer().size();
+    private Card[] getCurrentVisibleCards(Player player, int posInitCardToShow) {
+        int totalCards = player.getCardsPlayer().size();
         int numVisibleCards = Math.min(4, totalCards - posInitCardToShow);
         Card[] cards = new Card[numVisibleCards];
 
         for (int i = 0; i < numVisibleCards; i++) {
-            cards[i] = this.humanPlayer.getCard(posInitCardToShow + i);
+            cards[i] = player.getCard(posInitCardToShow + i);
         }
 
         return cards;
     }
 
     /**
+     * Gets the current visible cards for the human player starting from the specified position.
+     * @param posInitCardToShow the initial position to start showing the cards
+     * @return an array of currently visible cards for the human player
+     */
+    public Card[] getCurrentVisibleCardsHumanPlayer(int posInitCardToShow) {
+        return getCurrentVisibleCards(this.humanPlayer, posInitCardToShow);
+    }
+
+    /**
+     * Gets the current visible cards for the machine starting from the specified position.
+     * @param posInitCardToShow the initial position to start showing the cards
+     * @return an array of currently visible cards for the machine
+     */
+    public Card[] getCurrentVisibleCardsMachine(int posInitCardToShow) {
+        return getCurrentVisibleCards(this.machinePlayer, posInitCardToShow);
+    }
+
+
+    /**
      * Checks if the game is over.
-     *
      * @return True if the deck is empty, indicating the game is over; otherwise, false.
      */
     @Override
