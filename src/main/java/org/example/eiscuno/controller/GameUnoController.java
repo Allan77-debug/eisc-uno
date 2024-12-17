@@ -23,6 +23,7 @@ import org.example.eiscuno.model.machine.TurnEndCallback;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.unoenum.EISCUnoEnum;
+import org.example.eiscuno.sounds.Sounds;
 
 import java.util.Objects;
 
@@ -56,7 +57,7 @@ public class GameUnoController implements TurnEndCallback {
     private Button confirmColorButton;
 
     private PauseTransition unoTimer;
-
+    private Sounds gamemusic;
 
     private Player humanPlayer;
     private Player machinePlayer;
@@ -85,7 +86,10 @@ public class GameUnoController implements TurnEndCallback {
         disableColorSelection();
         this.gameUno.startGame();
         setButtonGraphics();
-
+        gamemusic = new Sounds();
+        gamemusic.loadSound("src/main/resources/org/example/eiscuno/audio/gametheme.wav");
+        gamemusic.loopSound();
+        gamemusic.lowerVolume(0.01);
         this.isPlayerTurn = true;
 
         // Mostrar la carta inicial en la mesa
