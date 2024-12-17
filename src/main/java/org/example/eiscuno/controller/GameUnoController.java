@@ -23,6 +23,9 @@ import org.example.eiscuno.model.machine.TurnEndCallback;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.unoenum.EISCUnoEnum;
+import org.example.eiscuno.sounds.Sounds;
+
+import java.util.Objects;
 
 public class GameUnoController implements TurnEndCallback {
 
@@ -30,7 +33,7 @@ public class GameUnoController implements TurnEndCallback {
     private GridPane gridPaneCardsMachine;
 
     @FXML
-    private GridPane gridPaneCardsPlayer;
+    GridPane gridPaneCardsPlayer;
 
     @FXML
     private ImageView tableImageView;
@@ -54,13 +57,13 @@ public class GameUnoController implements TurnEndCallback {
     private Button confirmColorButton;
 
     private PauseTransition unoTimer;
-
+    private Sounds gamemusic;
 
     private Player humanPlayer;
     private Player machinePlayer;
     private Deck deck;
     private Table table;
-    private GameUno gameUno;
+    GameUno gameUno;
     private int posInitCardToShow;
     private boolean isPlayerTurn;
     private GameUnoController gameController;
@@ -73,13 +76,24 @@ public class GameUnoController implements TurnEndCallback {
      */
     @FXML
     public void initialize() {
+        Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResource("/org/example/eiscuno/images/gamebg.png")).toExternalForm());
+        BackgroundImage background = new BackgroundImage(
+                backgroundImage,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(100, 100, true, true, true, true));
+        mainPane.setBackground(new Background(background));
         initVariables();
         updateUnoButtonVisibility();
         setupColorSelection();
         disableColorSelection();
         this.gameUno.startGame();
         setButtonGraphics();
-        setBackground(EISCUnoEnum.BACKGROUND_UNO.getFilePath());
+        gamemusic = new Sounds();
+        gamemusic.loadSound("src/main/resources/org/example/eiscuno/audio/gametheme.wav");
+        gamemusic.loopSound();
+        gamemusic.lowerVolume(0.01);
         this.isPlayerTurn = true;
 
         // Show the initial card on the table
@@ -116,23 +130,7 @@ public class GameUnoController implements TurnEndCallback {
         unoButton.setGraphic(unoImageView);
     }
 
-    /**
-     * Setting background image to scene
-     * @param backgroundPath Path of image
-     */
-    private void setBackground(String backgroundPath) {
-        Image backgroundImage = new Image(getClass().getResource(backgroundPath).toString());
 
-        BackgroundImage background = new BackgroundImage(
-                backgroundImage,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                new BackgroundSize(100, 100, true, true, false, true)
-        );
-
-        mainPane.setBackground(new Background(background));
-    }
 
     /**
      * Setting color that user choosed in the game
