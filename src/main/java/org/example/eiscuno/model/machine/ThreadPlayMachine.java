@@ -12,6 +12,7 @@ import org.example.eiscuno.model.deck.Deck;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/** * This class represents the machine's turn logic in the UNO game. */
 public class ThreadPlayMachine extends Thread {
     private final Table table;
     private final Player machinePlayer;
@@ -23,6 +24,16 @@ public class ThreadPlayMachine extends Thread {
     private static final Logger LOGGER = Logger.getLogger(ThreadPlayMachine.class.getName());
     private final GameUnoController gameController;
 
+    /**
+     * Constructor to initialize the ThreadPlayMachine with required parameters.
+     * @param table the game table
+     * @param machinePlayer the machine player
+     * @param humanPlayer the human player
+     * @param deck the deck of cards
+     * @param tableImageView the ImageView representing the card on the table
+     * @param callback the callback to notify when the machine's turn ends
+     * @param gameController the game controller
+     */
     public ThreadPlayMachine(Table table, Player machinePlayer, Player humanPlayer, Deck deck,
                              ImageView tableImageView, TurnEndCallback callback, GameUnoController gameController) {
         this.table = table;
@@ -53,7 +64,9 @@ public class ThreadPlayMachine extends Thread {
         }
     }
 
-
+    /**
+     * Plays the machine's turn.
+     */
     private void playTurn() {
         do {
 
@@ -107,6 +120,9 @@ public class ThreadPlayMachine extends Thread {
         } while (skipTurn); // Si skipTurn es true repetir el turno
     }
 
+    /**
+     * Shows an alert when the machine wins the game.
+     */
     private void showWinAlert() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -118,8 +134,10 @@ public class ThreadPlayMachine extends Thread {
         });
     }
 
-
-
+    /**
+     * Handles the effects of special cards.
+     * @param card the special card being played
+     */
     private void handleSpecialCardEffect(Card card) {
         switch (card.getValue()) {
             case "Skip":
@@ -162,10 +180,18 @@ public class ThreadPlayMachine extends Thread {
 
     private volatile boolean skipTurn; // Nueva bandera para Skip
 
+    /**
+     * Sets the flag to skip the turn.
+     * @param skipTurn the new value for the skipTurn flag
+     */
     public void setSkipTurn(boolean skipTurn) {
         this.skipTurn = skipTurn;
     }
 
+    /**
+     * Chooses a random color.
+     * @return the randomly chosen color
+     */
     private String chooseRandomColor() {
         String[] colors = {"RED", "YELLOW", "BLUE", "GREEN"};
         int index = (int) (Math.random() * colors.length);
@@ -173,6 +199,10 @@ public class ThreadPlayMachine extends Thread {
         return colors[index];
     }
 
+    /**
+     * Finds a playable card from the machine's hand.
+     * @return the playable card or null if no playable card is found
+     */
     private Card findPlayableCard() {
         Card topCard = table.getCurrentCardOnTheTable();
 
@@ -197,7 +227,10 @@ public class ThreadPlayMachine extends Thread {
         return null; // No hay cartas jugables
     }
 
-
+    /**
+     * Setting the player played
+     * @param hasPlayerPlayed boolean to know is player has played
+     */
     public synchronized void setHasPlayerPlayed(boolean hasPlayerPlayed) {
         this.hasPlayerPlayed = hasPlayerPlayed;
         notify(); // Notificar al hilo para que ejecute el turno

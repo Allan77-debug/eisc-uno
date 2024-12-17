@@ -49,6 +49,11 @@ public class Deck {
         Collections.shuffle(deckOfCards);
     }
 
+    /**
+     * Gets the value of the card based on its name.
+     * @param name the name of the card
+     * @return the value of the card or null if the card is not valid
+     */
     private String getCardValue(String name) {
         if (name.endsWith("0")) {
             return "0";
@@ -81,10 +86,15 @@ public class Deck {
         } else if (name.equals("WILD")) {
             return "Wild";
         } else {
-            return null; // Para cartas no validas
+            return null; // For invalid cards
         }
     }
 
+    /**
+     * Gets the color of the card based on its name.
+     * @param name the name of the card
+     * @return the color of the card or null if the card has no valid color
+     */
     private String getCardColor(String name) {
         if (name.startsWith("GREEN")) {
             return "GREEN";
