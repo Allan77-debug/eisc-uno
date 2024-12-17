@@ -1,9 +1,11 @@
 // Controlador mejorado usando SOLID
 package org.example.eiscuno.controller;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
@@ -11,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.model.game.GameUno;
@@ -49,6 +52,8 @@ public class GameUnoController implements TurnEndCallback {
 
     @FXML
     private Button confirmColorButton;
+
+    private PauseTransition unoTimer;
 
 
     private Player humanPlayer;
@@ -285,6 +290,7 @@ public class GameUnoController implements TurnEndCallback {
         tableImageView.setImage(card.getImage()); // Actualizar la imagen en la mesa
         humanPlayer.removeCard(findCardIndexInHand(card)); // Eliminar la carta de la mano del jugador
         renderHumanPlayerCards(); // Actualizar las cartas visibles del jugador
+        deck.addToDiscardPile(card);
 
         if (card.isSpecial() && (card.getValue().equals("Wild") || card.getValue().equals("+4"))) {
             System.out.println("Special card played: " + card.getValue());
@@ -302,9 +308,67 @@ public class GameUnoController implements TurnEndCallback {
             endPlayerTurn(); // Finalizar el turno del jugador
         }
 
-        if (humanPlayer.getCardCount() == 0) {
-            System.out.println("Player has no more cards! You win!");
+        if (humanPlayer.getCardCount() == 1) {
+            System.out.println("Player has only one card left! Starting UNO timer...");
+            startUnoTimer(); // Iniciar el temporizador de UNO
         }
+
+        if (humanPlayer.getCardCount() == 0) {
+            showWinAlert(); // Mostrar alerta y reiniciar juego
+        }
+    }
+
+    private void showWinAlert() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("¡Victoria!");
+            alert.setHeaderText("¡Felicidades!");
+            alert.setContentText("Has ganado la partida. El juego se reiniciará.");
+            alert.showAndWait();
+
+            resetGame(); // Reiniciar el juego después de mostrar la alerta
+        });
+    }
+
+    public void resetGame() {
+        // Inicializa el mazo y la mesa
+        this.deck = new Deck();  // Crea un nuevo mazo y lo inicializa automáticamente
+        this.table = new Table();  // Crea la mesa vacía
+
+        // Inicializa los jugadores
+        this.humanPlayer = new Player("HUMAN_PLAYER");
+        this.machinePlayer = new Player("MACHINE_PLAYER");
+
+        // Inicializa el juego
+        this.gameUno = new GameUno(this.humanPlayer, this.machinePlayer, this.deck, this.table);
+
+
+        this.gameUno.startGame();
+        try {
+            Card initialCard = this.table.getCurrentCardOnTheTable();
+            this.tableImageView.setImage(initialCard.getImage());
+        } catch (IllegalStateException e) {
+            System.out.println("Error inicializando la mesa: " + e.getMessage());
+        }
+
+        // Reinicia las variables de estado del juego
+        this.posInitCardToShow = 0;
+        this.isPlayerTurn = true;
+
+        // Actualiza la visibilidad del botón UNO
+        updateUnoButtonVisibility();
+
+        // Deshabilita la selección de color
+        disableColorSelection();
+
+        // Renderiza las cartas de los jugadores
+        renderMachineCards();
+        renderHumanPlayerCards();
+
+        // Reinicia los hilos
+        initThreads();
+
+        System.out.println("El juego se ha reiniciado.");
     }
 
 
@@ -377,7 +441,7 @@ public class GameUnoController implements TurnEndCallback {
         }
     }
 
-    
+
     /**
      * Finds the index of a card in the human player's hand.
      *
@@ -419,7 +483,7 @@ public class GameUnoController implements TurnEndCallback {
             renderHumanPlayerCards();
             endPlayerTurn(); // Finaliza el turno del jugador después de tomar una carta
         } else {
-            System.out.println("The deck is empty. You cannot take a card.");
+            deck.reshuffleDeck();
         }
     }
 
@@ -436,10 +500,47 @@ public class GameUnoController implements TurnEndCallback {
 
     @FXML
     void onHandleUno(ActionEvent event) {
-        if (this.humanPlayer.getCardsPlayer().size() == 1) {
-            System.out.println("Player says UNO!");
+        if (this.humanPlayer.getCardCount() == 1) {
+            System.out.println("UNO button pressed in time!");
+            if (unoTimer != null) {
+                unoTimer.stop(); // Detener el temporizador si presionó el botón
+            }
         } else {
-            System.out.println("You cannot declare UNO! You have " + this.humanPlayer.getCardsPlayer().size() + " cards.");
+            System.out.println("You can't press UNO now! You have more than one card.");
+        }
+    }
+
+    private void startUnoTimer() {
+        if (unoTimer != null) {
+            unoTimer.stop(); // Detiene el temporizador previo si existiera
+        }
+
+        // Crear un tiempo aleatorio entre 2 y 4 segundos
+        int randomTime = 2000 + (int) (Math.random() * 2000);
+
+        unoTimer = new PauseTransition(Duration.millis(randomTime));
+        unoTimer.setOnFinished(event -> {
+            // Penalización si el jugador no presionó el botón UNO
+            if (this.humanPlayer.getCardCount() == 1) {
+                System.out.println("You didn't press UNO in time! Taking a penalty card...");
+                Platform.runLater(() -> {
+                    takePenaltyCard();
+                    endPlayerTurn();
+                });
+            }
+        });
+
+        unoTimer.play(); // Iniciar el temporizador
+    }
+
+    // Método para tomar una carta como penalización
+    private void takePenaltyCard() {
+        if (!deck.isEmpty()) {
+            Card penaltyCard = deck.takeCard();
+            this.humanPlayer.addCard(penaltyCard);
+            System.out.println("Penalty card: " + penaltyCard.getValue() +
+                    " of " + (penaltyCard.getColor() != null ? penaltyCard.getColor() : "ANY"));
+            renderHumanPlayerCards();
         }
     }
 
